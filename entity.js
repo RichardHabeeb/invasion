@@ -3,8 +3,8 @@ function Entity(layer) {
 	this.health = 100;
 	this.x = 0;
 	this.y = 0;
-	this.grid_x = 0;
-	this.grid_y = 0;
+	this.row = 0;
+	this.col = 0;
 	this.move_time = 0.15;
 	
 	
@@ -38,25 +38,28 @@ function Entity(layer) {
 		this.anim.play();
 	};
 	
-	this.MoveUp = function() {
-		this.Move(function() { self.y = Math.max(0, self.y-PX_PER_CELL); });
-	};
 	
-	this.MoveDown = function() {
-		this.Move(function() { self.y = Math.min(WINDOW_HEIGHT_PX, self.y+PX_PER_CELL); });
-	};
-	
-	this.MoveLeft = function() {
-		this.Move(function() { self.x = Math.max(0, self.x-PX_PER_CELL); });
-	};
-	
-	this.MoveRight = function() {
-		this.Move(function() { self.x = Math.min(WINDOW_WIDTH_PX, self.x+PX_PER_CELL); });
-	};
-	
-	this.Move = function(adjustXY) {
+	this.Move = function(heading) {
 		if(this.anim == null || (typeof this.anim === "object" && this.anim.tween._time >= this.anim.tween.duration)) {
-			adjustXY();
+			switch(heading) {
+				case NORTH:
+					this.row -= 1;
+					this.y = Math.max(0, this.y-PX_PER_CELL);
+					break;
+				case EAST:
+					this.col += 1;
+					this.x = Math.min(WINDOW_WIDTH_PX, this.x+PX_PER_CELL);
+					break;
+				case SOUTH:
+					this.row += 1;
+					this.y = Math.min(WINDOW_HEIGHT_PX, this.y+PX_PER_CELL);
+					break;
+				case WEST:
+					this.col -= 1;
+					this.x = Math.max(0, this.x-PX_PER_CELL);
+					break;
+			}
+		
 			this.SetupTween();
 		}
 	};

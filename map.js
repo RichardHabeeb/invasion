@@ -1,8 +1,3 @@
-const NORTH = "NORTH";
-const EAST  = "EAST";
-const SOUTH = "SOUTH";
-const WEST  = "WEST";
-
 function Map() {
 	this.number_of_updates = 0;
 	this.size_x = 10;
@@ -21,11 +16,11 @@ function Map() {
 	for(var r = 0; r < WINDOW_HEIGHT_CELLS; r++) {
 		this.walls[r] = new Array();
 		for(var c = 0; c < WINDOW_WIDTH_CELLS; c++) {
-			this.walls[r][c] = {
-				"north": 	false,
-				"east":		false,
-				"south":	false,
-				"west":		false
+			this.walls[r][c] = { //Put walls on the outer edges.
+				NORTH: 	(r == 0) ? true : false,
+				EAST:	(c == WINDOW_WIDTH_CELLS-1) ? true : false,
+				SOUTH:	(r == WINDOW_HEIGHT_CELLS-1) ? true : false,
+				WEST:	(c == 0) ? true : false
 			};
 		}
 	}
@@ -82,18 +77,27 @@ function Map() {
 	
 	};
 	
-	this.MoveEntity = function(entity) {
-	
+	this.MoveEntity = function(entity, heading) {
+		if(this.walls[entity.row][entity.col][heading] === false) entity.Move(heading);
 	};
 	
 	this.SetWall = function(row, col, heading) {
 		if(heading === NORTH) {
 			this.walls[row][col][NORTH] = true;
 			if(row-1 >= 0) this.walls[row-1][col][SOUTH] = true;
+			
+		} else if(heading === EAST) {
+			this.walls[row][col][EAST] = true;
+			if(col+1 < WINDOW_WIDTH_CELLS) this.walls[row][col+1][WEST] = true;
+			
+		} else if(heading === SOUTH) {
+			this.walls[row][col][SOUTH] = true;
+			if(row+1 < WINDOW_HEIGHT_CELLS) this.walls[row+1][col][NORTH] = true;
+		
+		} else if(heading === WEST) {
+			this.walls[row][col][WEST] = true;
+			if(row-1 >= 0) this.walls[row][col-1][EAST] = true;
 		}
 	};
-	
-	this.SetWall(0,0,NORTH);
-	console.log(this.walls);
 	
 }

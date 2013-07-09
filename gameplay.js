@@ -20,10 +20,10 @@ var a_pressed = false;
 var s_pressed = false;
 var d_pressed = false;
 setInterval(function() {
-	if(w_pressed) current_map.player.MoveUp();
-	if(a_pressed) current_map.player.MoveLeft();
-	if(s_pressed) current_map.player.MoveDown();
-	if(d_pressed) current_map.player.MoveRight();
+	if(w_pressed) current_map.MoveEntity(current_map.player, NORTH);
+	if(a_pressed) current_map.MoveEntity(current_map.player, WEST);
+	if(s_pressed) current_map.MoveEntity(current_map.player, SOUTH);
+	if(d_pressed) current_map.MoveEntity(current_map.player, EAST);
 }, 10); //poll keypress flags every ten ms.
 
 
