@@ -61,6 +61,10 @@ function Entity(layer) {
 		}
 	}
 	
+	this.OnDeath = function() {
+		self.layer.remove(self.sprite);
+	}
+	
 	
 
 }
