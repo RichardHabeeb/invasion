@@ -48,7 +48,6 @@ function Map() {
 		this.items_layer.draw();
 		this.monster_layer.draw();
 		this.player_layer.draw();
-		document.getElementById('DebugStats').innerHTML=++this.number_of_updates;
 	};
 	
 	
@@ -69,12 +68,15 @@ function Map() {
 	};
 	
 	this.HandleMonsterMovements = function() {
-	
+		monsters.forEach(function(mob) {
+			if(mob.IsStopped())
+				this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, player.row, player.col)); //move a mob towards player (untested)
+			
+		}, this);
 	};
 	
-	this.GetNextBestCell = function(row_start, col_start, row_end, col_end) {
-	
-	
+	this.GetNextBestHeading = function(row_start, col_start, row_end, col_end) {
+		return NORTH; //an algorithm for finding the next best heading to travel given a starting point, and ending point and the array of wall locations. (Flood fill or A* potentially).
 	};
 	
 	this.MoveEntity = function(entity, heading) {

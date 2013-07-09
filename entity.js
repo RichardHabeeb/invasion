@@ -38,9 +38,13 @@ function Entity(layer) {
 		this.anim.play();
 	};
 	
+	this.IsStopped = function() {
+		return (this.anim == null || (typeof this.anim === "object" && this.anim.tween._time >= this.anim.tween.duration));
+	}
+	
 	
 	this.Move = function(heading) {
-		if(this.anim == null || (typeof this.anim === "object" && this.anim.tween._time >= this.anim.tween.duration)) {
+		if(IsStopped()) {
 			switch(heading) {
 				case NORTH:
 					this.row -= 1;
