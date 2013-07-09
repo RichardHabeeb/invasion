@@ -1,8 +1,8 @@
 
 var stage = new Kinetic.Stage({
 	container: 'GameWindow',
-	width: 640,
-	height: 640
+	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
+	height: WINDOW_HEIGHT_CELLS*PX_PER_CELL
 });
 
 var current_map = new Map();

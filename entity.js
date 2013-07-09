@@ -44,7 +44,7 @@ function Entity(layer) {
 	
 	
 	this.Move = function(heading) {
-		if(IsStopped()) {
+		if(this.IsStopped()) {
 			switch(heading) {
 				case NORTH:
 					this.row -= 1;
@@ -70,6 +70,7 @@ function Entity(layer) {
 	
 	this.OnDeath = function() {
 		self.layer.remove(self.sprite);
+		//drop all items in inventory?
 	}
 	
 	

@@ -52,26 +52,36 @@ function Map() {
 	
 	
 	this.GenerateTerrain = function(seed) {
-		
+		//This is called once at the beginning of the game
 	};
 	
 	this.PopulateMonsters = function() {
-	
+		//This is called once at the beginning of the game
 	};
 	
 	this.PopulateItems = function() {
-	
+
 	};
 	
 	this.HandleMonsterSpawning = function() {
-	
+		/* Factors that affect the monster spawning.
+				_ # of aliens on map
+				- Player health
+				- Player health lost since last spawn handling
+				- Time since last player damage
+				- The "power" of the player (possibly determined by item strength)
+				- distance of player from animals
+				- LUCK!
+		*/
+		
+		
+		
 	};
 	
 	this.HandleMonsterMovements = function() {
 		monsters.forEach(function(mob) {
 			if(mob.IsStopped())
-				this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, player.row, player.col)); //move a mob towards player (untested)
-			
+				this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, player.row, player.col)); //move a mob towards player (untested) (this needs to be the animals instead)
 		}, this);
 	};
 	
