@@ -1,3 +1,8 @@
+const NORTH = "NORTH";
+const EAST  = "EAST";
+const SOUTH = "SOUTH";
+const WEST  = "WEST";
+
 function Map() {
 	this.number_of_updates = 0;
 	this.size_x = 10;
@@ -12,6 +17,18 @@ function Map() {
 	this.monster_layer = new Kinetic.Layer();
 	this.player_layer = new Kinetic.Layer();
 	
+	this.walls = new Array();
+	for(var r = 0; r < WINDOW_HEIGHT_CELLS; r++) {
+		this.walls[r] = new Array();
+		for(var c = 0; c < WINDOW_WIDTH_CELLS; c++) {
+			this.walls[r][c] = {
+				"north": 	false,
+				"east":		false,
+				"south":	false,
+				"west":		false
+			};
+		}
+	}
 	
 	
 	this.SetupMapOnStage = function(stage) {
@@ -39,6 +56,7 @@ function Map() {
 		document.getElementById('DebugStats').innerHTML=++this.number_of_updates;
 	};
 	
+	
 	this.GenerateTerrain = function(seed) {
 		
 	};
@@ -58,5 +76,24 @@ function Map() {
 	this.HandleMonsterMovements = function() {
 	
 	};
+	
+	this.GetNextBestCell = function(row_start, col_start, row_end, col_end) {
+	
+	
+	};
+	
+	this.MoveEntity = function(entity) {
+	
+	};
+	
+	this.SetWall = function(row, col, heading) {
+		if(heading === NORTH) {
+			this.walls[row][col][NORTH] = true;
+			if(row-1 >= 0) this.walls[row-1][col][SOUTH] = true;
+		}
+	};
+	
+	this.SetWall(0,0,NORTH);
+	console.log(this.walls);
 	
 }
