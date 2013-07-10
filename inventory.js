@@ -1,7 +1,7 @@
 function Inventory() {
 	var self = this;
 	// !!!Refrain from random access since we are using splice to remove items!!!
-	item items = new Array();
+	var items = new Array();
 	
 	// Check if 'indexOf' is an available method to the browser
 	// If not, use the custom function!!!! ! ZOMGGGG

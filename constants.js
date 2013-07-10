@@ -10,8 +10,9 @@ const NORTH = "NORTH";
 const EAST  = "EAST";
 const SOUTH = "SOUTH";
 const WEST  = "WEST";
-const FILLED = "FILLED"; //if a cell is a barrier entirely
+const BLOCKED = "BLOCKED"; //if a cell is a barrier entirely
 
 
-const TOTAL_MOB_CAP = 30;
-const TOTAL_MOB_SPAWN_GROUP = 5;
+const TOTAL_MOB_CAP = 30; 
+const TOTAL_MOB_SPAWN_GROUP = 5; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)
+const MAP_EDGE_SPAWN_ZONE = 4; //the game can spawn mobs within MAP_EDGE_SPAWN_ZONE spaces of the edge

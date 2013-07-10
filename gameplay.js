@@ -50,3 +50,7 @@ keypress.register_combo({
     "on_keydown"        : function() { d_pressed = true;},
 	"on_keyup"			: function() { d_pressed = false;}
 });
+
+
+
+current_map.HandleMonsterSpawning();

@@ -1,10 +1,11 @@
-function Entity(layer) {
+function Entity(layer, r, c) {
 	var self = this;
 	this.health = 100;
-	this.x = 0;
-	this.y = 0;
-	this.row = 0;
-	this.col = 0;
+	this.row = r;
+	this.col = c;
+	this.x = PX_PER_CELL*c;
+	this.y = PX_PER_CELL*r;
+
 	this.move_time = 0.15; //time in tween animation in secs
 	
 	this.time_of_last_hit = (new Date()).getTime(); // update this later using a new Date();
@@ -42,6 +43,7 @@ function Entity(layer) {
 	this.IsStopped = function() {
 		return (this.anim == null || (typeof this.anim === "object" && this.anim.tween._time >= this.anim.tween.duration));
 	}
+
 	
 	
 	this.Move = function(heading) {
