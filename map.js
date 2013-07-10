@@ -7,6 +7,8 @@ function Map() {
 	this.player;
 	this.interval;
 	
+	this.time_map_created = (new Date()).getTime();
+	
 	this.background_layer = new Kinetic.Layer();
 	this.items_layer = new Kinetic.Layer();
 	this.monster_layer = new Kinetic.Layer();
@@ -21,6 +23,7 @@ function Map() {
 				EAST:	(c == WINDOW_WIDTH_CELLS-1) ? true : false,
 				SOUTH:	(r == WINDOW_HEIGHT_CELLS-1) ? true : false,
 				WEST:	(c == 0) ? true : false
+				FILLED: false;
 			};
 		}
 	}
@@ -63,6 +66,17 @@ function Map() {
 
 	};
 	
+	this.GreedySearchForValidSpawnCell = function(size) {
+		
+		var spawn_pivot_cell_x;
+		var spawn_pivot_cell_y;
+		var spawn_pivot_cell_valid = false;
+		//while(!spawn_pivot_cell_valid) {};
+		
+		return {spawn_pivot_cell_x,spawn_pivot_cell_y};
+	}
+				
+	
 	this.HandleMonsterSpawning = function() {
 		/* Factors that affect the monster spawning.
 				_ # of aliens on map
@@ -74,6 +88,21 @@ function Map() {
 				- LUCK!
 		*/
 		
+		//the probability of spawning an alien horde is proportional to the # of aliens available to spawn as well as the time since the player was last damaged.
+		if(monsters.length < TOTAL_MOB_CAP && Math.random() > (monsters.length(double)/TOTAL_MOB_CAP )) { 
+			
+			//the number of mobs that are spawned is based in part on the time since the player was last damaged.
+			var number_of_mobs_to_spawn = Math.ceil(Math.random()*Math.min(((new Date()).getTime() - player.time_of_last_hit)/(15.0*1000), 1.0)*Math.min(TOTAL_MOB_CAP - monsters.length, TOTAL_MOB_SPAWN_GROUP));
+			
+			//search for open area near the edge. greedy style.
+			var spawn_cell = this.GreedySearchForValidSpawnCell(number_of_mobs_to_spawn);
+			
+			
+			for(var i = 0; i < number_of_mobs_to_spawn; i++) {
+				
+			
+			}
+		}
 		
 		
 	};

@@ -5,8 +5,9 @@ function Entity(layer) {
 	this.y = 0;
 	this.row = 0;
 	this.col = 0;
-	this.move_time = 0.15;
+	this.move_time = 0.15; //time in tween animation in secs
 	
+	this.time_of_last_hit = (new Date()).getTime(); // update this later using a new Date();
 	
 	this.imageObj = new Image();
 	this.imageObj.src = 'images\\Brain Jelly.png';

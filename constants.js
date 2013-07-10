@@ -10,3 +10,8 @@ const NORTH = "NORTH";
 const EAST  = "EAST";
 const SOUTH = "SOUTH";
 const WEST  = "WEST";
+const FILLED = "FILLED"; //if a cell is a barrier entirely
+
+
+const TOTAL_MOB_CAP = 30;
+const TOTAL_MOB_SPAWN_GROUP = 5;
