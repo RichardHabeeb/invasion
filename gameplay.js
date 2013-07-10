@@ -52,5 +52,16 @@ keypress.register_combo({
 });
 
 
+setInterval(function() {
+	current_map.HandleMonsterSpawning();
+}, 1000); //handle monsters pawning every 2000 ms.
 
-current_map.HandleMonsterSpawning();
+
+var monster_movement_handler = function() {
+	current_map.HandleMonsterMovements();
+	setTimeout(monster_movement_handler, Math.random()*250);
+}
+monster_movement_handler();
+
+
+

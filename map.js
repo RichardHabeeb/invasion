@@ -59,6 +59,13 @@ function Map() {
 
 	};
 	
+	this.GetCellInHeading = function(r,c,heading) {
+				if(heading == NORTH) return {"r": Math.max(r-1, 0), 				"c":c};
+		else 	if(heading == EAST ) return {"r": r, 								"c": Math.min(c+1, this.size_c-1)};
+		else 	if(heading == SOUTH) return {"r": Math.min(r+1, this.size_r-1), 	"c":c};
+		else 					   return {"r": r, 								"c": Math.min(c-1, 0)};
+	}
+	
 	this.IsValidSpawnCell = function(cell_r, cell_c) {
 		return !(((cell_r >= MAP_EDGE_SPAWN_ZONE && cell_r < this.size_r-MAP_EDGE_SPAWN_ZONE) &&
 				 (cell_c >= MAP_EDGE_SPAWN_ZONE && cell_c < this.size_r-MAP_EDGE_SPAWN_ZONE)) ||
@@ -106,45 +113,61 @@ function Map() {
 		
 		while(!spawn_pivot_cell_valid) {
 			tested_cells[pivot_cell_r, pivot_cell_c] = true;
-			if(GetNumberOfOpenAdjacentCells(pivot_cell_r, pivot_cell_c) >= size-1) spawn_pivot_cell_valid = true;
+			if(this.GetNumberOfOpenAdjacentCells(pivot_cell_r, pivot_cell_c) >= size-1) spawn_pivot_cell_valid = true;
 			else {
 				var next_r = pivot_cell_r;
 				var next_c = pivot_cell_c;
 				var next_best_num_open_cells = 0;
 				var temp_next;
-				if(pivot_cell_r-1 >= 0 && !tested_cells[pivot_cell_r-1][pivot_cell_c] && 
-					this.IsValidSpawnCell(pivot_cell_r-1, pivot_cell_c) && 
-					(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r-1, pivot_cell_c)) > next_best_num_open_cells) 
-				{
-					next_best_num_open_cells = temp_next;
-					next_r = pivot_cell_r-1;
-					next_r = pivot_cell_c;
-					
-				} else if(pivot_cell_r+1 < this.size_r && !tested_cells[pivot_cell_r+1][pivot_cell_c] && 
-					this.IsValidSpawnCell(pivot_cell_r+1, pivot_cell_c) && 
-					(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r+1, pivot_cell_c)) > next_best_num_open_cells) 
-				{
-					next_best_num_open_cells = temp_next;
-					next_r = pivot_cell_r+1;
-					next_r = pivot_cell_c;
-					
-				} else if(pivot_cell_c-1 >= 0 && !tested_cells[pivot_cell_r][pivot_cell_c-1] && 
-					this.IsValidSpawnCell(pivot_cell_r, pivot_cell_c-1) && 
-					(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r, pivot_cell_c-1)) > next_best_num_open_cells) 
-				{
-					next_best_num_open_cells = temp_next;
-					next_r = pivot_cell_r;
-					next_r = pivot_cell_c-1;
-					
-				} else if(pivot_cell_c+1 < this.size_r && !tested_cells[pivot_cell_r][pivot_cell_c+1] && 
-					this.IsValidSpawnCell(pivot_cell_r, pivot_cell_c+1) && 
-					(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r, pivot_cell_c+1)) > next_best_num_open_cells) 
-				{
-					next_best_num_open_cells = temp_next;
-					next_r = pivot_cell_r;
-					next_r = pivot_cell_c+1;
-				} else 
-				{
+				
+				if(pivot_cell_r-1 >= 0) {
+					if(!tested_cells[pivot_cell_r-1][pivot_cell_c] && 
+						this.IsValidSpawnCell(pivot_cell_r-1, pivot_cell_c) && 
+						(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r-1, pivot_cell_c)) > next_best_num_open_cells) 
+					{
+						next_best_num_open_cells = temp_next;
+						next_r = pivot_cell_r-1;
+						next_c = pivot_cell_c;
+						
+					}
+				}
+				
+				if(pivot_cell_r+1 < this.size_r) {
+					if(!tested_cells[pivot_cell_r+1][pivot_cell_c] && 
+						this.IsValidSpawnCell(pivot_cell_r+1, pivot_cell_c) && 
+						(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r+1, pivot_cell_c)) > next_best_num_open_cells) 
+					{
+						next_best_num_open_cells = temp_next;
+						next_r = pivot_cell_r+1;
+						next_c = pivot_cell_c;
+						
+					}
+				}
+				console.log(pivot_cell_c-1 >= 0);
+				if(pivot_cell_c-1 >= 0) {
+					if(!tested_cells[pivot_cell_r][pivot_cell_c-1] && 
+						this.IsValidSpawnCell(pivot_cell_r, pivot_cell_c-1) && 
+						(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r, pivot_cell_c-1)) > next_best_num_open_cells) 
+					{
+						next_best_num_open_cells = temp_next;
+						next_r = pivot_cell_r;
+						next_c = pivot_cell_c-1;
+						
+					}
+				}
+				
+				if(pivot_cell_c+1 < this.size_r) {
+					if(!tested_cells[pivot_cell_r][pivot_cell_c+1] && 
+						this.IsValidSpawnCell(pivot_cell_r, pivot_cell_c+1) && 
+						(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r, pivot_cell_c+1)) > next_best_num_open_cells) 
+					{
+						next_best_num_open_cells = temp_next;
+						next_r = pivot_cell_r;
+						next_c = pivot_cell_c+1;
+					}
+				}
+				
+				if(next_best_num_open_cells == 0) {
 					//Check to make sure an unchecked spawn cell still exists.
 					var spawn_cells_dont_exist = true;
 					for(var r = 0; r < this.size_r; r++) {
@@ -177,6 +200,11 @@ function Map() {
 		return {"r": pivot_cell_r, "c": pivot_cell_c};
 	};
 	
+	this.SpawnMob = function(r, c) {
+		var mob = new Entity(this.monster_layer, r, c);
+		mob.move_time = 1;
+		this.monsters.push(mob);
+	}
 	
 	this.HandleMonsterSpawning = function() {
 		/* Factors that affect the monster spawning.
@@ -201,20 +229,32 @@ function Map() {
 			//search for open area near the edge. greedy style.
 			var spawn_cell = this.GreedySearchForValidSpawnCell(number_of_mobs_to_spawn);
 			if(spawn_cell != null) { 
-				console.log("# of mobs to spawn: " + number_of_mobs_to_spawn);
 				//spawn teh mobs!
-				var mob = new Entity(this.monster_layer, spawn_cell["r"], spawn_cell["c"]);
-				this.monsters.push(mob);
+				this.SpawnMob(spawn_cell["r"], spawn_cell["c"]);
+				number_of_mobs_to_spawn--;
+				
+				var spawn_cell_area = new Array(NORTH,EAST,SOUTH,WEST);
+				for(var i = 0; i < number_of_mobs_to_spawn; i++) {
+					var roll = Math.floor(Math.random()*spawn_cell_area.length);
+					var spawn_cell_local = this.GetCellInHeading(spawn_cell["r"], spawn_cell["c"],spawn_cell_area[roll]);
+					if(spawn_cell_local)
+					spawn_cell_area.splice(roll);
+					
+					this.SpawnMob(spawn_cell_local["r"], spawn_cell_local["c"]);
+					
+				}
 				
 			}
 		}
 	};
 	
 	this.HandleMonsterMovements = function() {
-		monsters.forEach(function(mob) {
-			if(mob.IsStopped())
-				this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, player.row, player.col)); //move a mob towards player (untested) (this needs to be the animals instead)
-		}, this);
+	
+		for(var i = 0; i < this.monsters.length; i++) {
+			var mob = this.monsters[i];
+			if(mob.IsStopped() && Math.random() > 0.5)
+				this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, this.player.row, this.player.col)); //move a mob towards player (untested) (this needs to be the animals instead)
+		}
 	};
 	
 	this.GetNextBestHeading = function(row_start, col_start, row_end, col_end) {

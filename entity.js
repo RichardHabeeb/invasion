@@ -23,22 +23,15 @@ function Entity(layer, r, c) {
 			image: this.imageObj,
 	});
 	
+	this.loaded = false;
 	this.imageObj.onload = function() {
 		self.layer.add(self.sprite);
 		self.layer.draw();
+		self.loaded = true;
 	};
 	
 	
-	this.SetupTween = function () {
-		this.anim = new Kinetic.Tween({
-			node: this.sprite,
-			x: this.x,
-			y: this.y,
-			duration: this.move_time,
-			easing: Kinetic.Easings.Linear
-		});
-		this.anim.play();
-	};
+
 	
 	this.IsStopped = function() {
 		return (this.anim == null || (typeof this.anim === "object" && this.anim.tween._time >= this.anim.tween.duration));
@@ -47,7 +40,7 @@ function Entity(layer, r, c) {
 	
 	
 	this.Move = function(heading) {
-		if(this.IsStopped()) {
+		if(this.loaded && this.IsStopped()) {
 			switch(heading) {
 				case NORTH:
 					this.row -= 1;
@@ -66,8 +59,15 @@ function Entity(layer, r, c) {
 					this.x = Math.max(0, this.x-PX_PER_CELL);
 					break;
 			}
-		
-			this.SetupTween();
+			
+			this.anim = new Kinetic.Tween({
+				node: this.sprite,
+				x: this.x,
+				y: this.y,
+				duration: this.move_time,
+				easing: Kinetic.Easings.Linear
+			});
+			this.anim.play();
 		}
 	};
 	
