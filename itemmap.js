@@ -5,4 +5,5 @@ function ItemMap(name, image)
 	this.image = image;
 	
 	
-}
+};
+

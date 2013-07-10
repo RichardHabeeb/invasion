@@ -75,4 +75,16 @@ function Inventory() {
 		}
 		
 	}
+	
+	this.RemoveAll = function()
+	{
+		var length = items.length, 
+			element = null;
+			
+		for (var i = 0; i < length; i++) 
+		{
+			element = items[i];
+			RemoveItem(element);
+		}
+	}
 }

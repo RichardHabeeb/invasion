@@ -5,7 +5,7 @@ function Entity(layer, r, c) {
 	this.col = c;
 	this.x = PX_PER_CELL*c;
 	this.y = PX_PER_CELL*r;
-
+	this.inv = new Inventory();
 	this.move_time = 0.15; //time in tween animation in secs
 	
 	this.time_of_last_hit = (new Date()).getTime(); // update this later using a new Date();
@@ -73,7 +73,8 @@ function Entity(layer, r, c) {
 	};
 	
 	this.OnDeath = function() {
-		self.layer.remove(self.sprite);
+		this.layer.remove(self.sprite);
+		this.inv.RemoveAll();
 		//drop all items in inventory?
 	}
 	
