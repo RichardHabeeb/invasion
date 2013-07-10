@@ -27,6 +27,7 @@ function Entity(layer, r, c) {
 	this.imageObj.onload = function() {
 		self.layer.add(self.sprite);
 		self.layer.draw();
+		self.sprite.setZIndex(self.row);
 		self.loaded = true;
 	};
 	

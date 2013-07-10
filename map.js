@@ -60,17 +60,18 @@ function Map() {
 	};
 	
 	this.GetCellInHeading = function(r,c,heading) {
-				if(heading == NORTH) return {"r": Math.max(r-1, 0), 				"c":c};
-		else 	if(heading == EAST ) return {"r": r, 								"c": Math.min(c+1, this.size_c-1)};
-		else 	if(heading == SOUTH) return {"r": Math.min(r+1, this.size_r-1), 	"c":c};
-		else 					   return {"r": r, 								"c": Math.min(c-1, 0)};
+				if(heading == NORTH) 	return {"r": Math.max(r-1, 0), 				"c":c};
+		else 	if(heading == EAST ) 	return {"r": r, 								"c": Math.min(c+1, this.size_c-1)};
+		else 	if(heading == SOUTH) 	return {"r": Math.min(r+1, this.size_r-1), 	"c":c};
+		else 					   		return {"r": r, 								"c": Math.max(c-1, 0)};
 	}
 	
 	this.IsValidSpawnCell = function(cell_r, cell_c) {
 		return !(((cell_r >= MAP_EDGE_SPAWN_ZONE && cell_r < this.size_r-MAP_EDGE_SPAWN_ZONE) &&
 				 (cell_c >= MAP_EDGE_SPAWN_ZONE && cell_c < this.size_r-MAP_EDGE_SPAWN_ZONE)) ||
 				 (this.walls[cell_r][cell_c][NORTH] && this.walls[cell_r][cell_c][EAST] && 
-				  this.walls[cell_r][cell_c][SOUTH] && this.walls[cell_r][cell_c][WEST] ));
+				  this.walls[cell_r][cell_c][SOUTH] && this.walls[cell_r][cell_c][WEST]) ||
+				  (this.walls[cell_r][cell_c][BLOCKED]));
 	};
 	
 	this.GetRandomSpawnCell = function() {
@@ -143,7 +144,7 @@ function Map() {
 						
 					}
 				}
-				console.log(pivot_cell_c-1 >= 0);
+
 				if(pivot_cell_c-1 >= 0) {
 					if(!tested_cells[pivot_cell_r][pivot_cell_c-1] && 
 						this.IsValidSpawnCell(pivot_cell_r, pivot_cell_c-1) && 
@@ -190,6 +191,9 @@ function Map() {
 						} while(tested_cells[temp_cell["r"]][temp_cell["c"]]);
 					}
 					
+				} else {
+					pivot_cell_r = next_r;
+					pivot_cell_c = next_c;
 				}
 					
 				
@@ -229,6 +233,7 @@ function Map() {
 			//search for open area near the edge. greedy style.
 			var spawn_cell = this.GreedySearchForValidSpawnCell(number_of_mobs_to_spawn);
 			if(spawn_cell != null) { 
+			
 				//spawn teh mobs!
 				this.SpawnMob(spawn_cell["r"], spawn_cell["c"]);
 				number_of_mobs_to_spawn--;
@@ -237,11 +242,11 @@ function Map() {
 				for(var i = 0; i < number_of_mobs_to_spawn; i++) {
 					var roll = Math.floor(Math.random()*spawn_cell_area.length);
 					var spawn_cell_local = this.GetCellInHeading(spawn_cell["r"], spawn_cell["c"],spawn_cell_area[roll]);
-					if(spawn_cell_local)
+					if(spawn_cell_local != spawn_cell) {
+						
+						this.SpawnMob(spawn_cell_local["r"], spawn_cell_local["c"]);
+					}
 					spawn_cell_area.splice(roll);
-					
-					this.SpawnMob(spawn_cell_local["r"], spawn_cell_local["c"]);
-					
 				}
 				
 			}
