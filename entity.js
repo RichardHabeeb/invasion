@@ -65,7 +65,7 @@ function Entity(layer, r, c, target) {
 					this.x = Math.max(0, this.x-PX_PER_CELL);
 					break;
 			}
-			
+			self.sprite.setZIndex(self.row);
 			this.anim = new Kinetic.Tween({
 				node: this.sprite,
 				x: this.x,
