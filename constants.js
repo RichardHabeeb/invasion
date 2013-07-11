@@ -11,6 +11,7 @@ const EAST  = "EAST";
 const SOUTH = "SOUTH";
 const WEST  = "WEST";
 const BLOCKED = "BLOCKED"; //if a cell is a barrier entirely
+const IMAGE = "IMAGE"; //the image for a wall or barrier
 
 var ITEM_IMAGES = {
 	"sword" : "images\\sword.png"
@@ -32,7 +33,10 @@ var ITEM_ANIMATIONS = {
 
 const TOTAL_MOB_CAP = 30; 
 const TOTAL_MOB_SPAWN_GROUP = 5; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)
-const MAP_EDGE_SPAWN_ZONE = 4; //the game can spawn mobs within MAP_EDGE_SPAWN_ZONE spaces of the edge
+const MAP_EDGE_SPAWN_ZONE = 3; //the game can spawn mobs within MAP_EDGE_SPAWN_ZONE spaces of the edge
+
+const MAP_MAX_BARRIERS = 20;
+const MAP_MIN_BARRIERS = 3;
 
 //constants used for the flooding algo.
 const UNASSIGNED_FLOOD_DEPTH = Number.MAX_VALUE;
@@ -44,4 +48,7 @@ var ALIEN_IMAGES = [	"images\\Brain Jelly.png",
 						"images\\Young Alien Red-Fire.png",
 						"images\\Jelly.png",
 						"images\\Young Alien.png"];
-						
+
+var BARRIER_IMAGES = [	"images\\barrier1.png",
+						"images\\barrier2.png",
+						"images\\barrier3.png"];

@@ -3,7 +3,7 @@ function Map() {
 	this.size_r = WINDOW_HEIGHT_CELLS;
 	this.size_c = WINDOW_WIDTH_CELLS;
 	this.entities; //a 2d array of monster entities
-	this.walls; //a 2d array of walls and blocks
+	this.walls; //a 2d array of logical walls and blocks
 	this.items; //a 2d array of items
 	this.monster_count = 0;
 	this.item_count = 0;
@@ -16,10 +16,15 @@ function Map() {
 	this.items_layer = new Kinetic.Layer();
 	this.monster_layer = new Kinetic.Layer();
 	this.player_layer = new Kinetic.Layer();
+	this.walls_layer = new Kinetic.Layer();
 	
-	
-	this.GenerateTerrain = function(seed) {
-		//This is called once at the beginning of the game
+	this.GenerateTerrain = function() {
+		var num_barriers = MAP_MIN_BARRIERS+Math.floor(Math.random()*(MAP_MAX_BARRIERS-MAP_MIN_BARRIERS));
+		
+		for(var i = 0; i < num_barriers; i++) {
+			var cell = this.GetRandomOpenCell();
+			this.AddBarrier(cell["r"], cell["c"]);
+		}
 	};
 	
 	
@@ -33,7 +38,8 @@ function Map() {
 					EAST:	(c == this.size_c-1) ? true : false,
 					SOUTH:	(r == this.size_r-1) ? true : false,
 					WEST:	(c == 0) ? true : false,
-					BLOCKED: false
+					BLOCKED: false,
+					IMAGE:	 new MapCell(this.walls_layer, r, c)
 				};
 			}
 		}
@@ -89,10 +95,12 @@ function Map() {
 			stage.add(this.items_layer);
 			stage.add(this.monster_layer);
 			stage.add(this.player_layer);
+			stage.add(this.walls_layer);
 			this.background_layer.draw();
 			this.items_layer.draw();
 			this.monster_layer.draw();
 			this.player_layer.draw();
+			this.walls_layer.draw();
 		} else alert("Error setting up " + (typeof stage));
 	};
 	
@@ -102,10 +110,10 @@ function Map() {
 		else 	if(heading == EAST ) 	return {"r": r, 							"c": Math.min(c+1, this.size_c-1)};
 		else 	if(heading == SOUTH) 	return {"r": Math.min(r+1, this.size_r-1), 	"c":c};
 		else 					   		return {"r": r, 							"c": Math.max(c-1, 0)};
-	}
+	};
 	
 	
-	this.IsValidSpawnCell = function(cell_r, cell_c) {
+	this.IsValidSpawnCell = function(cell_r, cell_c) { //On the map, on the edge. not blocked, not occupied
 		return !( 	cell_r < 0 || 	
 					cell_r >= this.size_r ||
 					cell_c < 0 ||
@@ -127,7 +135,23 @@ function Map() {
 				);
 	};
 	
-	this.GetRandomSpawnCell = function() {
+	
+	this.IsValidOpenCell = function(cell_r, cell_c) { //on the map, no walls, barriers, or entites.
+		return ( 	(cell_r >= 0 && 	
+					cell_r < this.size_r &&
+					cell_c >= 0 &&
+					cell_c < this.size_c) &&
+					!this.walls[cell_r][cell_c][NORTH]   &&
+					!this.walls[cell_r][cell_c][EAST]    &&
+					!this.walls[cell_r][cell_c][SOUTH]   && 
+					!this.walls[cell_r][cell_c][WEST]    &&
+					!this.walls[cell_r][cell_c][BLOCKED] &&
+					this.entities[cell_r][cell_c] == null
+				);
+	};
+	
+	
+	this.GetRandomSpawnCell = function() { //This needs improvement...
 		//get random valid starting point.
 		var cell_c = null;
 		var cell_r = null;
@@ -140,6 +164,21 @@ function Map() {
 		return {"r": cell_r, "c": cell_c};
 	};
 	
+	
+	this.GetRandomOpenCell = function() { //This needs improvement...
+		//get random valid starting point.
+		var cell_c = null;
+		var cell_r = null;
+		
+		while(cell_c == null || cell_r == null || !this.IsValidOpenCell(cell_r, cell_c))
+		{	 
+			cell_r = Math.floor(Math.random()*this.size_r);
+			cell_c = Math.floor(Math.random()*this.size_c);
+		}
+		return {"r": cell_r, "c": cell_c};
+	};
+	
+	
 	this.GetNumberOfSpawnableAdjacentCells = function(r, c) {
 		var count = 0;
 		if(this.IsValidSpawnCell(r+1, c)) count++;
@@ -148,6 +187,7 @@ function Map() {
 		if(this.IsValidSpawnCell(r, c-1))  count++;
 		return count;
 	};
+	
 	
 	this.GreedySearchForValidSpawnCell = function(size) {
 		
@@ -228,13 +268,15 @@ function Map() {
 		return {"r": pivot_cell_r, "c": pivot_cell_c};
 	};
 	
+	
 	this.SpawnMob = function(r, c) {
 		var mob = new Entity(this.monster_layer, r, c, this.cow);
 		mob.move_time = 1;
 		mob.imageObj.src = ALIEN_IMAGES[Math.floor(Math.random()*ALIEN_IMAGES.length)];
 		this.entities[mob.row][mob.col] = mob;
 		this.monster_count++;
-	}
+	};
+	
 	
 	this.HandleMonsterSpawning = function() {
 		/* Factors that affect the monster spawning.
@@ -290,6 +332,7 @@ function Map() {
 		}
 	};
 	
+	
 	this.HandleMonsterMovements = function() {
 		for(var r = 0; r < this.size_r; r++) {
 			for(var c = 0; c < this.size_c; c++) {
@@ -300,6 +343,7 @@ function Map() {
 			}
 		}
 	};
+	
 	
 	this.HandleCowMovement = function() {
 		if(this.cow.IsStopped() && Math.random() > 0.5) {
@@ -345,7 +389,8 @@ function Map() {
 			}
 		} // end of frontier depth 'for' loop
 	    
-	}
+	};
+	
 	
 	this.GetNextBestHeading = function(row_start, col_start, row_end, col_end) {
 	    var flooded_map = this.FloodMaze(row_start, col_start, row_end, col_end);
@@ -379,7 +424,6 @@ function Map() {
 	
 	
 
-	
 	this.MoveEntity = function(entity, heading) {
 		var adjacent = this.GetCellInHeading(entity.row,entity.col,heading);
 		
@@ -418,6 +462,16 @@ function Map() {
 			this.walls[row][col][WEST] = true;
 			if(row-1 >= 0) this.walls[row][col-1][EAST] = true;
 		}
+	};
+	
+	
+	this.AddBarrier = function(r, c) {
+		if(!this.IsValidOpenCell(r, c) || this.walls[r][c][IMAGE] == null) return false;
+		
+		this.walls[r][c][BLOCKED] = true;
+		this.walls[r][c][IMAGE].PushImage(BARRIER_IMAGES[Math.floor(Math.random()*BARRIER_IMAGES.length)]);
+		
+		return true;
 	};
 	
 	
