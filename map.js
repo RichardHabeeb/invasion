@@ -106,12 +106,25 @@ function Map() {
 	
 	
 	this.IsValidSpawnCell = function(cell_r, cell_c) {
-		return !(((cell_r >= MAP_EDGE_SPAWN_ZONE && cell_r < this.size_r-MAP_EDGE_SPAWN_ZONE) &&
-				 (cell_c >= MAP_EDGE_SPAWN_ZONE && cell_c < this.size_r-MAP_EDGE_SPAWN_ZONE)) ||
-				 (this.walls[cell_r][cell_c][NORTH] && this.walls[cell_r][cell_c][EAST] && 
-				  this.walls[cell_r][cell_c][SOUTH] && this.walls[cell_r][cell_c][WEST]) ||
-				 (this.walls[cell_r][cell_c][BLOCKED]) ||
-				 (this.entities[cell_r][cell_c] != null));
+		return !( 	cell_r < 0 || 	
+					cell_r >= this.size_r ||
+					cell_c < 0 ||
+					cell_c >= this.size_c ||
+					(	
+						cell_r >= MAP_EDGE_SPAWN_ZONE && 
+						cell_r < this.size_r-MAP_EDGE_SPAWN_ZONE &&
+						cell_c >= MAP_EDGE_SPAWN_ZONE && 
+						cell_c < this.size_r-MAP_EDGE_SPAWN_ZONE
+					) ||
+					(
+						this.walls[cell_r][cell_c][NORTH] && 
+						this.walls[cell_r][cell_c][EAST] && 
+						this.walls[cell_r][cell_c][SOUTH] && 
+						this.walls[cell_r][cell_c][WEST]
+					) ||
+					this.walls[cell_r][cell_c][BLOCKED] ||
+					this.entities[cell_r][cell_c] != null
+				);
 	};
 	
 	this.GetRandomSpawnCell = function() {
@@ -127,12 +140,12 @@ function Map() {
 		return {"r": cell_r, "c": cell_c};
 	};
 	
-	this.GetNumberOfOpenAdjacentCells = function(r, c) {
+	this.GetNumberOfSpawnableAdjacentCells = function(r, c) {
 		var count = 0;
-		if(!this.walls[r][c][NORTH]) count++;
-		if(!this.walls[r][c][EAST])  count++;
-		if(!this.walls[r][c][SOUTH]) count++;
-		if(!this.walls[r][c][WEST])  count++;
+		if(this.IsValidSpawnCell(r+1, c)) count++;
+		if(this.IsValidSpawnCell(r-1, c))  count++;
+		if(this.IsValidSpawnCell(r, c+1)) count++;
+		if(this.IsValidSpawnCell(r, c-1))  count++;
 		return count;
 	};
 	
@@ -154,59 +167,30 @@ function Map() {
 		
 		while(!spawn_pivot_cell_valid) {
 			tested_cells[pivot_cell_r, pivot_cell_c] = true;
-			if(this.GetNumberOfOpenAdjacentCells(pivot_cell_r, pivot_cell_c) >= size-1) spawn_pivot_cell_valid = true;
+			if(this.GetNumberOfSpawnableAdjacentCells(pivot_cell_r, pivot_cell_c) >= size-1) spawn_pivot_cell_valid = true;
 			else {
 				var next_r = pivot_cell_r;
 				var next_c = pivot_cell_c;
 				var next_best_num_open_cells = 0;
 				var temp_next;
 				
-				if(pivot_cell_r-1 >= 0) {
-					if(!tested_cells[pivot_cell_r-1][pivot_cell_c] && 
-						this.IsValidSpawnCell(pivot_cell_r-1, pivot_cell_c) && 
-						(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r-1, pivot_cell_c)) > next_best_num_open_cells) 
+				var headings = new Array(NORTH,EAST,SOUTH,WEST);
+				
+				for(var i = 0; i < headings.length; i++) {
+				
+					var cell = this.GetCellInHeading(pivot_cell_r, pivot_cell_c, headings[i]);
+					
+					if((cell["r"] != pivot_cell_r || cell["c"] != pivot_cell_c) &&
+						!tested_cells[cell["r"]][cell["c"]] && 
+						this.IsValidSpawnCell(cell["r"], cell["c"]) && 
+						(temp_next = this.GetNumberOfSpawnableAdjacentCells(cell["r"], cell["c"])) > next_best_num_open_cells)
 					{
 						next_best_num_open_cells = temp_next;
-						next_r = pivot_cell_r-1;
-						next_c = pivot_cell_c;
-						
+						next_r = cell["r"];
+						next_c = cell["c"];
 					}
 				}
 				
-				if(pivot_cell_r+1 < this.size_r) {
-					if(!tested_cells[pivot_cell_r+1][pivot_cell_c] && 
-						this.IsValidSpawnCell(pivot_cell_r+1, pivot_cell_c) && 
-						(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r+1, pivot_cell_c)) > next_best_num_open_cells) 
-					{
-						next_best_num_open_cells = temp_next;
-						next_r = pivot_cell_r+1;
-						next_c = pivot_cell_c;
-						
-					}
-				}
-
-				if(pivot_cell_c-1 >= 0) {
-					if(!tested_cells[pivot_cell_r][pivot_cell_c-1] && 
-						this.IsValidSpawnCell(pivot_cell_r, pivot_cell_c-1) && 
-						(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r, pivot_cell_c-1)) > next_best_num_open_cells) 
-					{
-						next_best_num_open_cells = temp_next;
-						next_r = pivot_cell_r;
-						next_c = pivot_cell_c-1;
-						
-					}
-				}
-				
-				if(pivot_cell_c+1 < this.size_r) {
-					if(!tested_cells[pivot_cell_r][pivot_cell_c+1] && 
-						this.IsValidSpawnCell(pivot_cell_r, pivot_cell_c+1) && 
-						(temp_next = this.GetNumberOfOpenAdjacentCells(pivot_cell_r, pivot_cell_c+1)) > next_best_num_open_cells) 
-					{
-						next_best_num_open_cells = temp_next;
-						next_r = pivot_cell_r;
-						next_c = pivot_cell_c+1;
-					}
-				}
 				
 				if(next_best_num_open_cells == 0) {
 					//Check to make sure an unchecked spawn cell still exists.
@@ -281,14 +265,25 @@ function Map() {
 				number_of_mobs_to_spawn--;
 				
 				var spawn_cell_area = new Array(NORTH,EAST,SOUTH,WEST);
-				for(var i = 0; i < number_of_mobs_to_spawn; i++) {
+				
+				
+				for(var i = 0; i < Math.min(number_of_mobs_to_spawn,spawn_cell_area.length); i++) {
+					
 					var roll = Math.floor(Math.random()*spawn_cell_area.length);
+					
 					var spawn_cell_local = this.GetCellInHeading(spawn_cell["r"], spawn_cell["c"],spawn_cell_area[roll]);
-					if(spawn_cell_local != spawn_cell) {
+					
+					if((spawn_cell_local["r"] != spawn_cell["r"] || spawn_cell_local["c"] != spawn_cell["c"]) && 
+						this.IsValidSpawnCell(spawn_cell_local["r"], spawn_cell_local["c"])) 
+					{
 						
 						this.SpawnMob(spawn_cell_local["r"], spawn_cell_local["c"]);
+					} else {
+						i--; //yeah this is kinda silly, but it works.
 					}
+					
 					spawn_cell_area.splice(roll);
+					
 				}
 				
 			}
@@ -425,7 +420,5 @@ function Map() {
 		}
 	};
 	
-	
-
 	
 }
