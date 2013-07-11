@@ -1,14 +1,21 @@
-function Item(layer, name, image, damage, radius)
+function Item(key)
 {
-	this.name = name;
-	this.image = image;
-	this.damage = damage;
-	this.radius = radius;
+	var self = this;
+	this.name = key;
+	this.image = ITEM_IMAGES[key];
+	this.damage = ITEM_DAMAGES[key];
+	this.anim = ITEM_ANIMATIONS[key];
 	
 	this.imageObj = new Image();
 	imageObj.src = this.image;
 	
-	this.layer = layer;
+	this.loaded = false;
+	this.imageObj.onload = function() {
+		self.layer.add(self.sprite);
+		self.layer.draw();
+		self.loaded = true;
+	};
+	
 	this.sprite = new Kinetic.Image({
 			
 			width: PX_PER_CELL,
