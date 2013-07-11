@@ -1,23 +1,42 @@
 @color1: #E0E2E4;
 @color2: #303030;
+@black-opaque: rgba(0,0,0,0.3);
 @bg: #1E1E1E;
-@window_size:800px;
+@brown: #544242;
+@window_x:960px;
+@window_y:640px;
 
 @game-bg-color: #B3B48E;
+
+@font-face {
+    font-family: Higher;
+    src: url(fonts/Higher.ttf);
+}
+
+@font-face {
+    font-family: Square;
+    src: url(fonts/Square.ttf);
+}
 
 .standard-text(@size: 25px) {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight: 300;
     font-size: @size;
-    text-shadow: 1px 1px @color2;
+    text-shadow: 2px 2px @black-opaque;
     letter-spacing: -1px;
     color: @color1;
 }
 
 .big-text {
-    .standard-text(75px);
-    letter-spacing: -7px;
-    color: red; 
+    font-family: Higher;
+    font-size: 150px;
+    text-shadow: 5px 5px @black-opaque;
+    letter-spacing: 0px;
+    color: @color1;
+}
+
+.standard-shadow(@offset: 5px, @alpha: 0.3) {
+    box-shadow:@offset @offset rgba(0,0,0,@alpha);
 }
 
 .rounded-corners (@radius: 5px) {
@@ -26,6 +45,15 @@
   -ms-border-radius: @radius;
   -o-border-radius: @radius;
   border-radius: @radius;
+}
+
+.gradient (@startColor: @bg, @endColor: @brown) {
+    background-color: @startColor;
+	background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));
+	background: -webkit-linear-gradient(top, @startColor, @endColor);
+	background: -moz-linear-gradient(top, @startColor, @endColor);
+	background: -ms-linear-gradient(top, @startColor, @endColor);
+	background: -o-linear-gradient(top, @startColor, @endColor);
 }
 
 .center-div {
@@ -38,11 +66,33 @@ body {
 }
 
 #GameWindow {
-    .rounded-corners;
     .center-div;
-    width:@window_size;
-    height:@window_size;
+    .rounded-corners;
+    .standard-shadow;
+    width:@window_x;
+    height:@window_y;
     border:10px solid @color2;
     background-color: @game-bg-color;
 }
 
+#Header {
+    .center-div;
+    .big-text;
+    text-align:center;
+}
+
+#Footer {
+    div {
+        .center-div;
+        .big-text; 
+        max-width:1000px;
+        font-family: Square;
+    }
+    .gradient;
+    .center-div;
+    .standard-text(10px);
+    height: 600px;
+    margin-top:100px;
+    text-align:center;
+    
+}
