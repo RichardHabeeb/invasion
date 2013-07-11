@@ -1,7 +1,9 @@
 function Inventory() {
-	var self = this;
+
 	// !!!Refrain from random access since we are using splice to remove items!!!
 	var items = new Array();
+	this.currentItem;
+	
 	
 	// Check if 'indexOf' is an available method to the browser
 	// If not, use the custom function!!!! ! ZOMGGGG
@@ -51,40 +53,41 @@ function Inventory() {
 			return -1;
 		}
 	}
+};
 	
-	this.EquipItem = function() 
+this.EquipItem = function(item)
+{
+	this.currentItem = item;
+}
+
+//Adds the given item to 'inventoy'
+this.AddItem = function(item) 
+{
+	this.items.push(item);
+	this.EquipItem(item);
+}
+
+//Removes the given item from 'inventory'
+this.RemoveItem = function(item) 
+{
+
+	// If it exists...
+	if (array.indexOf(item) != -1) 
 	{
-	
+		// Remove the item at the given index
+		this.items.splice(array.indexOf(item), 1);
 	}
 	
-	//Adds the given item to 'inventoy'
-	this.AddItem = function(item) 
-	{
-		self.items.push(item);
-	}
-	
-	//Removes the given item from 'inventory'
-	this.RemoveItem = function(item) 
-	{
-	
-		// If it exists...
-		if (array.indexOf(item) != -1) 
-		{
-			// Remove the item at the given index
-			self.items.splice(array.indexOf(item), 1);
-		}
+}
+
+this.RemoveAll = function()
+{
+	var length = items.length, 
+		element = null;
 		
-	}
-	
-	this.RemoveAll = function()
+	for (var i = 0; i < length; i++) 
 	{
-		var length = items.length, 
-			element = null;
-			
-		for (var i = 0; i < length; i++) 
-		{
-			element = items[i];
-			RemoveItem(element);
-		}
+		element = items[i];
+		RemoveItem(element);
 	}
 }

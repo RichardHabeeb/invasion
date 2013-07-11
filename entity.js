@@ -74,6 +74,17 @@ function Entity(layer, r, c, target) {
 		}
 	};
 	
+	this.Attack = function() {
+		if(this.loaded && this.IsStopped()) {
+			
+		}
+		
+		this.anim = new Kinetic.Tween({
+		
+		});
+		this.anim.play();
+	}
+	
 	this.OnDeath = function() {
 		this.layer.remove(self.sprite);
 		this.inv.RemoveAll();
