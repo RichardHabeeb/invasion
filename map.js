@@ -264,6 +264,14 @@ function Map() {
 		}
 	};
 	
+	this.HandleCowMovement = function() {
+		if(this.cow.IsStopped() && Math.random() > 0.5) {
+			var headings = [NORTH,EAST,SOUTH,WEST];
+			this.MoveEntity(this.cow, headings[Math.floor(Math.random()*headings.length)]);
+		}
+	}
+	
+	
 	this.FloodMaze = function(row_start, col_start, row_end, col_end) {
 		var flooded_map = new Array();
 		for(var r = 0; r < this.size_r; r++) {
@@ -361,6 +369,7 @@ function Map() {
 		var spawn_cell = this.GetRandomSpawnCell();
 		this.cow = new Entity(this.player_layer, Math.floor(this.size_r/2), Math.floor(this.size_c/2), null);
 		this.cow.health = 100;
+		this.cow.move_time = 2;
 		this.cow.imageObj.src = COW_IMAGE;
 	}
 	

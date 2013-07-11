@@ -54,7 +54,8 @@ keypress.register_combo({
 
 setInterval(function() {
 	current_map.HandleMonsterSpawning();
-}, 1000); //handle monsters pawning every 2000 ms.
+	current_map.HandleCowMovement();
+}, 1000); //handle monsters pawning every 1000 ms.
 
 
 var monster_movement_handler = function() {
