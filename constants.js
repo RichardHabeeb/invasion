@@ -12,16 +12,23 @@ const SOUTH = "SOUTH";
 const WEST  = "WEST";
 const BLOCKED = "BLOCKED"; //if a cell is a barrier entirely
 
-var ITEM_IMAGES = {"sword" : "images\\sword.png"};
-var ITEM_DAMAGES = {"sword" : 10};
-var ITEM_ANIMATIONS = {"sword" : new Kinetic.Tween({
-					node: this.sprite,
-					x: this.x,
-					y: this.y,
-					duration: this.move_time,
-					easing: Kinetic.Easings.Linear
-			});};
+var ITEM_IMAGES = {
+	"sword" : "images\\sword.png"
+};
 
+var ITEM_DAMAGES = {
+	"sword" : 10
+};
+/*
+var ITEM_ANIMATIONS = {
+	"sword" : (new Kinetic.Tween({
+		node: 		null,
+		x: 			0,
+		y: 			0,
+		duration: 	0,
+		easing: 	Kinetic.Easings.Linear}))
+};
+*/
 
 const TOTAL_MOB_CAP = 30; 
 const TOTAL_MOB_SPAWN_GROUP = 5; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)

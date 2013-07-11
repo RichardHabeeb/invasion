@@ -8,8 +8,9 @@ var stage = new Kinetic.Stage({
 var current_map = new Map();
 current_map.SetupMapOnStage(stage);
 current_map.GenerateTerrain(0);
-current_map.PopulateMonsters();
-current_map.PopulateItems();
+current_map.SetupWalls();
+current_map.SetupEntities();
+current_map.SetupItems();
 current_map.SetupCow();
 current_map.SetupPlayer();
 

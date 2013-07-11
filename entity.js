@@ -5,8 +5,8 @@ function Entity(layer, r, c, target) {
 	this.col = c;
 	this.target = target;
 	
-	this.x = PX_PER_CELL*c;
-	this.y = PX_PER_CELL*r;
+	this.x = (PX_PER_CELL*c)+PX_PER_CELL/2;
+	this.y = (PX_PER_CELL*r)+PX_PER_CELL/2;
 	this.inv = new Inventory();
 	this.move_time = 0.15; //time in tween animation in secs
 	
@@ -22,7 +22,8 @@ function Entity(layer, r, c, target) {
 			y: this.y,
 			width: PX_PER_CELL,
 			height: PX_PER_CELL,
-			image: this.imageObj,
+			offset: { x : PX_PER_CELL/2, y: PX_PER_CELL/2},
+			image: this.imageObj
 	});
 	
 	this.loaded = false;
@@ -51,6 +52,7 @@ function Entity(layer, r, c, target) {
 					break;
 				case EAST:
 					this.col += 1;
+					this.sprite.setScaleX(Math.abs(this.sprite.getScaleX()));
 					this.x = Math.min(WINDOW_WIDTH_PX, this.x+PX_PER_CELL);
 					break;
 				case SOUTH:
@@ -59,6 +61,7 @@ function Entity(layer, r, c, target) {
 					break;
 				case WEST:
 					this.col -= 1;
+					this.sprite.setScaleX(-Math.abs(this.sprite.getScaleX()));
 					this.x = Math.max(0, this.x-PX_PER_CELL);
 					break;
 			}
