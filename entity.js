@@ -1,8 +1,10 @@
-function Entity(layer, r, c) {
+function Entity(layer, r, c, target) {
 	var self = this;
 	this.health = 100;
 	this.row = r;
 	this.col = c;
+	this.target = target;
+	
 	this.x = PX_PER_CELL*c;
 	this.y = PX_PER_CELL*r;
 	this.inv = new Inventory();

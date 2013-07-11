@@ -5,6 +5,7 @@ function Map() {
 	this.monsters = new Array();
 	this.items = new Array();
 	this.player;
+	this.cow;
 	this.interval;
 	
 	this.time_map_created = (new Date()).getTime();
@@ -205,7 +206,7 @@ function Map() {
 	};
 	
 	this.SpawnMob = function(r, c) {
-		var mob = new Entity(this.monster_layer, r, c);
+		var mob = new Entity(this.monster_layer, r, c, this.cow);
 		mob.move_time = 1;
 		this.monsters.push(mob);
 	}
@@ -257,22 +258,70 @@ function Map() {
 	
 		for(var i = 0; i < this.monsters.length; i++) {
 			var mob = this.monsters[i];
-			if(mob.IsStopped() && Math.random() > 0.5)
-				this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, this.player.row, this.player.col)); //move a mob towards player (untested) (this needs to be the animals instead)
+			if(mob.IsStopped() && Math.random() > 0.5 && mob.target != null)
+				this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, mob.target.row, mob.target.col)); //move a mob towards player (untested) (this needs to be the animals instead)
 		}
 	};
 	
+	this.FloodMaze = function(row_start, col_start, row_end, col_end) {
+		var flooded_map = new Array();
+		for(var r = 0; r < this.size_r; r++) {
+			flooded_map[r] = new Array();
+			for(var c = 0; c < this.size_c; c++) {
+				flooded_map[r][c] = UNASSIGNED_FLOOD_DEPTH;
+			}
+		}
+
+		flooded_map[row_end][col_end] = 0;
+
+		// Flood from the middle of the maze towards the robot's current position
+		for(var frontier_depth = 1; frontier_depth < MAX_FRONTIER_DEPTH; frontier_depth++) 
+		{
+			for(var r = 0; r < this.size_r; r++)
+			{
+				for(var c = 0; c < this.size_c; c++)
+				{ 
+					if((flooded_map[r][c] == UNASSIGNED_FLOOD_DEPTH) && (
+					(r+1 < this.size_r		&& (flooded_map[r+1][c] == frontier_depth-1) && !this.walls[r][c][SOUTH]) ||
+					(r-1 >= 0			 	&& (flooded_map[r-1][c] == frontier_depth-1) && !this.walls[r][c][NORTH]) ||
+					(c+1 < this.size_c 		&& (flooded_map[r][c+1] == frontier_depth-1) && !this.walls[r][c][EAST])  ||
+					(c-1 >= 0	 			&& (flooded_map[r][c-1] == frontier_depth-1) && !this.walls[r][c][WEST])  ))
+					{
+						flooded_map[r][c] = frontier_depth; //the next cell's depth is the current cell's depth + 1
+						if(row_start == r && col_start == c) return flooded_map; // made it to the goal so we've flooded enough
+					}
+				}
+			}
+		} // end of frontier depth 'for' loop
+	    
+	}
+	
 	this.GetNextBestHeading = function(row_start, col_start, row_end, col_end) {
-		return NORTH; //an algorithm for finding the next best heading to travel given a starting point, and ending point and the array of wall locations. (Flood fill or A* potentially).
+	    var flooded_map = this.FloodMaze(row_start, col_start, row_end, col_end);
+		var next_best_heading = NORTH;
+		
+		if(flooded_map != null) {
+
+			
+			var headings = new Array(NORTH,EAST,SOUTH,WEST);
+			
+			var next_best_cell = {"r": row_start, "c": col_start};
+			
+			for(var i = 0; i < headings.length; i++) {
+				var cell = this.GetCellInHeading(row_start, col_start, headings[i]);
+				
+				if(flooded_map[next_best_cell["r"]][next_best_cell["c"]] > flooded_map[cell["r"]][cell["c"]]) {
+					next_best_cell = {"r": cell["r"], "c": cell["c"]};
+					next_best_heading = headings[i];
+				}
+					
+			}
+		}
+		return next_best_heading; //an algorithm for finding the next best heading to travel given a starting point, and ending point and the array of wall locations. (Flood fill or A* potentially).
 	};
 	
-	this.SetupPlayer = function() {
-		var spawn_cell = this.GetRandomSpawnCell();
-		this.player = new Entity(this.player_layer, spawn_cell["r"], spawn_cell["c"]);
-		this.player.health = 100;
-		this.player.imageObj.src = 'images\\Young Alien.png';
-		
-	};
+	
+
 	
 	this.MoveEntity = function(entity, heading) {
 		if(this.walls[entity.row][entity.col][heading] === false) entity.Move(heading);
@@ -298,8 +347,20 @@ function Map() {
 		}
 	};
 	
-	this.SetBlock = function(r,c) {
 	
+	this.SetupPlayer = function() {
+		var spawn_cell = this.GetRandomSpawnCell();
+		this.player = new Entity(this.player_layer, spawn_cell["r"], spawn_cell["c"], null);
+		this.player.health = 100;
+		this.player.imageObj.src = 'images\\Young Alien.png';
+		
+	};
+	
+	this.SetupCow = function() {
+		var spawn_cell = this.GetRandomSpawnCell();
+		this.cow = new Entity(this.player_layer, Math.floor(this.size_r/2), Math.floor(this.size_c/2), null);
+		this.cow.health = 100;
+		this.cow.imageObj.src = 'images\\cow.png';
 	}
 	
 }
