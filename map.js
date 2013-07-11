@@ -208,6 +208,7 @@ function Map() {
 	this.SpawnMob = function(r, c) {
 		var mob = new Entity(this.monster_layer, r, c, this.cow);
 		mob.move_time = 1;
+		mob.imageObj.src = ALIEN_IMAGES[Math.floor(Math.random()*ALIEN_IMAGES.length)];
 		this.monsters.push(mob);
 	}
 	
@@ -352,7 +353,7 @@ function Map() {
 		var spawn_cell = this.GetRandomSpawnCell();
 		this.player = new Entity(this.player_layer, spawn_cell["r"], spawn_cell["c"], null);
 		this.player.health = 100;
-		this.player.imageObj.src = 'images\\Young Alien.png';
+		this.player.imageObj.src = PLAYER_IMAGE;
 		
 	};
 	
@@ -360,7 +361,7 @@ function Map() {
 		var spawn_cell = this.GetRandomSpawnCell();
 		this.cow = new Entity(this.player_layer, Math.floor(this.size_r/2), Math.floor(this.size_c/2), null);
 		this.cow.health = 100;
-		this.cow.imageObj.src = 'images\\cow.png';
+		this.cow.imageObj.src = COW_IMAGE;
 	}
 	
 }

@@ -20,3 +20,11 @@ const MAP_EDGE_SPAWN_ZONE = 4; //the game can spawn mobs within MAP_EDGE_SPAWN_Z
 //constants used for the flooding algo.
 const UNASSIGNED_FLOOD_DEPTH = Number.MAX_VALUE;
 const MAX_FRONTIER_DEPTH = WINDOW_WIDTH_CELLS*WINDOW_HEIGHT_CELLS;
+
+const PLAYER_IMAGE = "images\\robot.png";
+const COW_IMAGE = "images\\cow.png";
+var ALIEN_IMAGES = [	"images\\Brain Jelly.png",
+						"images\\Young Alien Red-Fire.png",
+						"images\\Jelly.png",
+						"images\\Young Alien.png"];
+						
