@@ -19,7 +19,7 @@ function Entity(layer, r, c, target) {
 	
 	this.x = (PX_PER_CELL*c)+PX_PER_CELL/2;
 	this.y = (PX_PER_CELL*r)+PX_PER_CELL/2;
-	this.inv = new Inventory();
+
 	this.move_time = 0.15; //time in tween animation in secs
 	
 	this.time_of_last_hit = (new Date()).getTime(); // update this later using a new Date();
@@ -88,15 +88,10 @@ function Entity(layer, r, c, target) {
 		}
 	};
 	
-	this.Attack = function() {
-		if(this.loaded && this.IsStopped()) {
+	this.Attack = function(parent_map) {
+		if(this.loaded && this.IsStopped() && typeof this.currentItem != "undefined") {
 			
 		}
-		
-		this.anim = new Kinetic.Tween({
-		
-		});
-		this.anim.play();
 	}
 	
 	this.OnDeath = function() {

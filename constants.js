@@ -6,14 +6,12 @@
  *  -all the things.
  **/
 
+ //MAP CONSTANTS
 const PX_PER_CELL = 32;
-
 const WINDOW_WIDTH_CELLS = 30;
 const WINDOW_HEIGHT_CELLS = 20;
-
 const WINDOW_WIDTH_PX = WINDOW_WIDTH_CELLS*PX_PER_CELL;
 const WINDOW_HEIGHT_PX = WINDOW_HEIGHT_CELLS*PX_PER_CELL;
-
 const NORTH = "NORTH";
 const EAST  = "EAST";
 const SOUTH = "SOUTH";
@@ -22,19 +20,52 @@ const BLOCKED = "BLOCKED"; //if a cell is a barrier entirely
 const LOCKED = "LOCKED"; //if a cell is open and nothing can be placed there.
 const IMAGE = "IMAGE"; //the image for a wall or barrier
 
-var ITEM_KEYS = [
-	"sword",
-	"laser sword",
-	"machine gun",
-	"bomb"
-]
+//ITEM CONSTANTS
+const EQUIP = "EQUIP";
+const SINGLE_USE_WEAPON = "SINGLE_USE_WEAPON";
+const SINGLE_USE_BUFF = "SINGLE_USE_BUFF";
+const TRAP = "TRAP";
+const CONSTRUCTIVE = "CONSTRUCTIVE";
 
-var ITEM_IMAGES = {
-	"sword" : "images\\sword.png"
+//ITEM TEMPLATE STATIC CLASSES
+var TAZER = {
+	name: "Tazer",
+	type: EQUIP,
+	icon: "images/",
+	map_image: "images/",
+	animation_image: "images/", 
+	animation_duration: 0.3,
+	animation_easing: Kinetic.Easings.Linear,
+	single_direction: true,
+	melee: true,
+	range: 1,
+	base_damage: 50
 };
 
-var ITEM_DAMAGES = {
-	"sword" : 10
+var LASER_VISION = {
+	name: "Laser Vision",
+	type: EQUIP,
+	icon: "images/",
+	map_image: "images/",
+	animation_image: "images/", 
+	animation_duration: 0.1,
+	animation_easing: Kinetic.Easings.Linear,
+	single_direction: true,
+	melee: false,
+	range: 100,
+	base_damage: 200
+};
+
+var REPAIR_KIT = {
+	name: "Repair Kit",
+	type: SINGLE_USE_BUFF,
+	icon: "images/",
+	map_image: "images/",
+	animation_image: "images/", 
+	animation_duration: 0.1,
+	animation_easing: Kinetic.Easings.Linear,
+	buff_attribute: "health",
+	buff_amount: 100
 };
 
 var ITEM_SPAWN_LIMITS = {
@@ -51,16 +82,15 @@ var ITEM_PROBS = {
 	"bomb" : 40
 };
 
-/*
-var ITEM_ANIMATIONS = {
-	"sword" : (new Kinetic.Tween({
-		node: 		null,
-		x: 			0,
-		y: 			0,
-		duration: 	0,
-		easing: 	Kinetic.Easings.Linear}))
+
+var ITEM_DICT = {
+	"TAZER" : TAZER,
+	"LASER_VISION" : LASER_VISION,
+	"REPAIR_KIT" : REPAIR_KIT
+
 };
-*/
+
+
 
 const TOTAL_ITEM_CAP = 10;
 

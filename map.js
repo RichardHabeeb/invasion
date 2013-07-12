@@ -9,6 +9,7 @@
  *  -Improve non-flooded heading finding algorithm
  *  -Fix spawn edge zone bug
  *  -handle monster item drops
+ *  -change the ["r"] stuff to .r
  **/
 
 function Map() {
@@ -126,6 +127,11 @@ function Map() {
 			this.walls_layer.draw();
 		} else alert("Error setting up " + (typeof stage));
 	};
+	
+	
+	this.EntityAttack = function(entity) {
+		entity.Attack(this);
+	}
 	
 	
 	this.GetCellInHeading = function(r,c,heading) {
