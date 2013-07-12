@@ -1,3 +1,16 @@
+/**
+ * INVASION
+ * FILE: map.js
+ * AUTHORS: Richard Habeeb, Addison Shaw 
+ * TODO:
+ *  -Improve terrain generation
+ *  -Add background terrain generation
+ *  -Fix fence glitches
+ *  -Improve non-flooded heading finding algorithm
+ *  -Fix spawn edge zone bug
+ *  -handle monster item drops
+ **/
+
 function Map() {
 	this.number_of_updates = 0;
 	this.size_r = WINDOW_HEIGHT_CELLS;
@@ -17,6 +30,8 @@ function Map() {
 	this.monster_layer = new Kinetic.Layer();
 	this.player_layer = new Kinetic.Layer();
 	this.walls_layer = new Kinetic.Layer();
+	this.anim_layer = new Kinetic.Layer();
+	
 	
 	this.GenerateTerrain = function() {
 		

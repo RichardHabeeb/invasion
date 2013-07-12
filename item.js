@@ -1,3 +1,11 @@
+/**
+ * INVASION
+ * FILE: item.js
+ * AUTHORS: Richard Habeeb, Addison Shaw 
+ * TODO:
+ *  -all the things.
+ **/
+
 function Item(key)
 {
 	var self = this;

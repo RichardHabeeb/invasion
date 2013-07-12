@@ -1,3 +1,11 @@
+/**
+ * INVASION
+ * FILE: constants.js
+ * AUTHORS: Richard Habeeb, Addison Shaw 
+ * TODO:
+ *  -all the things.
+ **/
+
 const PX_PER_CELL = 32;
 
 const WINDOW_WIDTH_CELLS = 30;

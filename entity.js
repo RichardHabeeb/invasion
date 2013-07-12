@@ -1,3 +1,12 @@
+/**
+ * INVASION
+ * FILE: entity.js
+ * AUTHORS: Richard Habeeb, Addison Shaw 
+ * TODO:
+ *  -Handle inventory pickups and drops
+ *  -Handle attack requests
+ **/
+
 function Entity(layer, r, c, target) {
 	var self = this;
 	this.health = 100;

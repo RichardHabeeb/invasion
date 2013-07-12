@@ -1,4 +1,13 @@
-
+/**
+ * INVASION
+ * FILE: gameplay.js
+ * AUTHORS: Richard Habeeb, Addison Shaw 
+ * TODO:
+ *  -Setup attacking key combos
+ *	-Setup pregame menu / pause menu
+ *  -Do all the things.
+ **/
+ 
 var stage = new Kinetic.Stage({
 	container: 'GameWindow',
 	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
@@ -50,6 +59,7 @@ keypress.register_combo({
     "on_keydown"        : function() { d_pressed = true;},
 	"on_keyup"			: function() { d_pressed = false;}
 });
+
 
 
 setInterval(function() {

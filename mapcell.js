@@ -1,3 +1,11 @@
+/**
+ * INVASION
+ * FILE: mapcell.js
+ * AUTHORS: Richard Habeeb, Addison Shaw 
+ * TODO:
+ *  -handle removal of certain types of graphics. (fence, anim, bg, etc.)
+ **/
+ 
 function MapCell(layer, r, c) {
 	var self = this;
 	this.layer = layer; //this needs to know its layer for stupid reasons.
