@@ -14,7 +14,7 @@ function Entity(layer, r, c, target) {
 	this.col = c;
 	this.target = target;
 	
-	var items = new Array();
+	this.items = new Array();
 	this.currentItem;
 	
 	this.x = (PX_PER_CELL*c)+PX_PER_CELL/2;
@@ -89,8 +89,11 @@ function Entity(layer, r, c, target) {
 	};
 	
 	this.Attack = function(parent_map) {
-		if(this.loaded && this.IsStopped() && typeof this.currentItem != "undefined") {
-			
+		if(this.loaded && this.IsStopped() && typeof this.currentItem != "undefined" && (this.currentItem.type == EQUIP || this.currentItem.type == SINGLE_USE_WEAPON)) {
+			if(this.currentItem.type == EQUIP) {
+				this.currentItem.Animate(this.x, this.y);
+				
+			}
 		}
 	}
 	

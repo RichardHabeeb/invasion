@@ -100,7 +100,7 @@ function Map() {
 		this.player = new Entity(this.player_layer, spawn_cell["r"], spawn_cell["c"], null);
 		this.player.health = 100;
 		this.player.imageObj.src = PLAYER_IMAGE;
-		
+		this.player.AddItem(new Item("TAZER", this.items_layer, this.anim_layer));
 	};
 	
 	
@@ -120,11 +120,13 @@ function Map() {
 			stage.add(this.monster_layer);
 			stage.add(this.player_layer);
 			stage.add(this.walls_layer);
+			stage.add(this.anim_layer);
 			this.background_layer.draw();
 			this.items_layer.draw();
 			this.monster_layer.draw();
 			this.player_layer.draw();
 			this.walls_layer.draw();
+			this.anim_layer.draw();
 		} else alert("Error setting up " + (typeof stage));
 	};
 	

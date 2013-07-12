@@ -60,6 +60,10 @@ keypress.register_combo({
 	"on_keyup"			: function() { d_pressed = false;}
 });
 
+keypress.register_combo({
+    "keys"              : "j",
+    "on_keydown"        : function() { current_map.EntityAttack(current_map.player);}
+});
 
 
 setInterval(function() {

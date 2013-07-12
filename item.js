@@ -23,10 +23,16 @@ function Item(key, map_layer, animation_layer)
 	this.animation_image_loaded = false;
 	this.map_layer 				= map_layer;
 	this.animation_layer 		= animation_layer;
-	this.row					= 0;
-	this.col					= 0;
-	this.x						= 0;
-	this.y						= 0;
+	this.row_map				= 0;
+	this.col_map				= 0;
+	this.x_map					= 0;
+	this.y_map					= 0;
+	this.x_anim					= 0;
+	this.y_anim					= 0;
+	this.is_animating			= false;
+	this.is_visible_on_map		= false;
+	this.animation_type			= ITEM_DICT[key].animation_type;
+	this.animation_duration		= ITEM_DICT[key].animation_duration;
 
 	this.icon_image.onload = function() {
 		//self.layer.add(self.sprite);
@@ -35,13 +41,17 @@ function Item(key, map_layer, animation_layer)
 	};
 	
 	this.map_image.onload = function() {
+		if(!this.is_visible_on_map) 	self.map_sprite.hide();
+		else 							self.map_sprite.show();
 		self.map_layer.add(self.map_sprite);
 		self.map_layer.draw();
 		self.map_image_loaded = true;
 	};
 	
 	this.animation_image.onload = function() {
-		self.animation_layer.add(self.sprite);
+		if(!this.is_animating) 	self.animation_sprite.hide();
+		else 						self.animation_sprite.show();
+		self.animation_layer.add(self.animation_sprite);
 		self.animation_layer.draw();
 		self.animation_image_loaded = true;
 	};
@@ -64,8 +74,62 @@ function Item(key, map_layer, animation_layer)
 			image: this.animation_image
 	});
 	
+	this.SetMapRCXY = function (r, c) {
+		this.row_map = r;
+		this.col_map = c;
+		this.x_map = (PX_PER_CELL*c)+PX_PER_CELL/2;
+		this.y_map = (PX_PER_CELL*r)+PX_PER_CELL/2;
+		this.map_sprite.setPosition(this.x_map, this.y_map);
+	};
 	
-	//TYPE SPECIFIC STUFF HERE!!!!
+	this.SetAnimXY = function (x, y) {
+		this.x_anim = x;
+		this.y_anim = y
+		this.animation_sprite.setPosition(this.x_anim, this.y_anim);
+	};
+	
+	this.ShowImageOnMap = function(r, c) {
+		this.is_visible_on_map = true;
+		this.SetMapRCXY(r, c);
+		this.map_sprite.show();
+	};
+	
+	
+	//This should be improved by a dictionary, but I don't care right now. (I know this is kinda a ghetto way to do this.)
+	this.Animate = function(x, y) {
+		if(this.animation_image_loaded) {
+			if(this.animation_type == "BLINK") this.StartBlinkAnimation(x, y);
+			
+		}
+	
+	}
+	
+	
+	//BLINK - fade in and out over a period of time
+	this.blink_animation_period_ms = 500;
+	this.StartBlinkAnimation = function(x, y) {
+		if(!this.is_animating) {
+			this.SetAnimXY(x, y);
+			this.animation_sprite.show();
+			this.BlinkAnimation.start();
+			this.is_animating = true;
+			setTimeout(this.StopBlinkAnimation, this.animation_duration);
+		}
+	};
+	
+	this.StopBlinkAnimation = function() {
+		if(self.is_animating) {
+			self.animation_sprite.hide();
+			self.BlinkAnimation.stop();
+			self.is_animating = false;
+		}
+	};
+	this.BlinkAnimation = new Kinetic.Animation(function(frame) {
+		self.animation_sprite.setOpacity(Math.abs(Math.sin(frame.time * 2 * Math.PI / self.blink_animation_period_ms)));
+    }, this.animation_layer);
+	
+	
+
 	
 	
 };
