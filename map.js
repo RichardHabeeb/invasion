@@ -374,7 +374,7 @@ function Map() {
 			for(var c = 0; c < this.size_c; c++) {
 				var mob = this.entities[r][c];
 				if(mob != null && mob.target != null && mob.IsStopped() && Math.random() > 0.5) {
-					this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, mob.target.row, mob.target.col)); //move a mob towards player (untested) (this needs to be the animals instead)
+					this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, mob.target.row, mob.target.col, false)); //move a mob towards player (untested) (this needs to be the animals instead)
 				}
 			}
 		}
@@ -447,7 +447,7 @@ function Map() {
 	};
 	
 	
-	this.FloodMaze = function(row_start, col_start, row_end, col_end) {
+	this.FloodMaze = function(row_start, col_start, row_end, col_end, ignore_entities) {
 		var flooded_map = new Array();
 		for(var r = 0; r < this.size_r; r++) {
 			flooded_map[r] = new Array();
@@ -469,11 +469,20 @@ function Map() {
 			{
 				for(var c = 0; c < this.size_c; c++)
 				{ 
-					if((flooded_map[r][c] == UNASSIGNED_FLOOD_DEPTH) && !this.walls[r][c][BLOCKED] && (this.entities[r][c] == null || row_start == r && col_start == c) && (
-					(r+1 < this.size_r		&& (flooded_map[r+1][c] == frontier_depth-1) && !this.walls[r][c][SOUTH]) ||
-					(r-1 >= 0			 	&& (flooded_map[r-1][c] == frontier_depth-1) && !this.walls[r][c][NORTH]) ||
-					(c+1 < this.size_c 		&& (flooded_map[r][c+1] == frontier_depth-1) && !this.walls[r][c][EAST] ) ||
-					(c-1 >= 0	 			&& (flooded_map[r][c-1] == frontier_depth-1) && !this.walls[r][c][WEST] ) ))
+					if	(	flooded_map[r][c] == UNASSIGNED_FLOOD_DEPTH && 
+							!this.walls[r][c][BLOCKED] && 
+							(
+								this.entities[r][c] == null || 
+								(row_start == r && col_start == c) ||
+								ignore_entities
+							) && 
+							(
+								(r+1 < this.size_r		&& (flooded_map[r+1][c] == frontier_depth-1) && !this.walls[r][c][SOUTH]) ||
+								(r-1 >= 0			 	&& (flooded_map[r-1][c] == frontier_depth-1) && !this.walls[r][c][NORTH]) ||
+								(c+1 < this.size_c 		&& (flooded_map[r][c+1] == frontier_depth-1) && !this.walls[r][c][EAST] ) ||
+								(c-1 >= 0	 			&& (flooded_map[r][c-1] == frontier_depth-1) && !this.walls[r][c][WEST] ) 
+							)
+						)
 					{
 						flooded_map[r][c] = frontier_depth; //the next cell's depth is the current cell's depth + 1
 						flood_change = true;
@@ -486,8 +495,8 @@ function Map() {
 	};
 	
 	
-	this.GetNextBestHeading = function(row_start, col_start, row_end, col_end) {
-	    var flooded_map = this.FloodMaze(row_start, col_start, row_end, col_end);
+	this.GetNextBestHeading = function(row_start, col_start, row_end, col_end, ignore_entities) {
+	    var flooded_map = this.FloodMaze(row_start, col_start, row_end, col_end, ignore_entities);
 		
 		var next_best_heading = NORTH;
 
@@ -499,19 +508,31 @@ function Map() {
 			for(var i = 0; i < headings.length; i++) {
 				var cell = this.GetCellInHeading(row_start, col_start, headings[i]);
 				
-				if(flooded_map[next_best_cell["r"]][next_best_cell["c"]] > flooded_map[cell["r"]][cell["c"]]) {
+				if(	
+					!this.walls[row_start][col_start][headings[i]] && 
+					!this.walls[cell["r"]][cell["c"]][BLOCKED] && 
+					(this.entities[cell["r"]][cell["c"]] == null || ignore_entities) &&
+					flooded_map[next_best_cell["r"]][next_best_cell["c"]] > flooded_map[cell["r"]][cell["c"]]
+				  ) 
+				{
 					next_best_cell = {"r": cell["r"], "c": cell["c"]};
 					next_best_heading = headings[i];
 				}
 					
 			}
 			
+		} else if(!ignore_entities) {
+			
+			next_best_heading = this.GetNextBestHeading(row_start, col_start, row_end, col_end, true);
+			
 		} else {
-			//if no direct path is found just go directly towards the goal. Wall checking maybe necesarry here.
+			//if no direct path is found just go directly towards the goal. Wall checking maybe necessary here.
+			
 			if(row_start > row_end) next_best_heading = NORTH;
 			if(row_start < row_end) next_best_heading = SOUTH;
 			if(col_start > col_end) next_best_heading = WEST;
 			if(col_start < col_end) next_best_heading = EAST;
+			
 		}
 		return next_best_heading; //an algorithm for finding the next best heading to travel given a starting point, and ending point and the array of wall locations. (Flood fill or A* potentially).
 	};
