@@ -36,6 +36,21 @@ var ITEM_IMAGES = {
 var ITEM_DAMAGES = {
 	"sword" : 10
 };
+
+var ITEM_SPAWN_LIMITS = {
+	"sword" : 1,
+	"laser sword" : 1,
+	"machine gun" : 1,
+	"bomb" : 3
+};
+
+var ITEM_PROBS = {
+	"sword" : 30,
+	"laser sword" : 20,
+	"machine gun" : 10,
+	"bomb" : 40
+};
+
 /*
 var ITEM_ANIMATIONS = {
 	"sword" : (new Kinetic.Tween({

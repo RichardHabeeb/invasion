@@ -20,6 +20,10 @@ function Map() {
 	this.items; //a 2d array of items
 	this.monster_count = 0;
 	this.item_count = 0;
+	this.sword_count = 0;
+	this.laser_sword_count = 0;
+	this.machine_gun_count = 0;
+	this.bomb_count = 0;
 	this.player;
 	this.cow;
 	
@@ -411,11 +415,25 @@ function Map() {
 			if(spawn_cell != null) { 
 				//Get random item
 				var randItem = new Item(ITEM_KEYS[Math.floor((Math.random()*ITEM_KEYS.length))]);
-				/*
-					keep track of number of the current item that had been spawned
-					if it does not exceed it's type limit (need constant)
-						spawn teh item
-				*/
+				var itemLimit;
+				
+				//Get item limit
+				switch(randItem.name)
+				{
+					case "sword": 
+						itemLimit = this.sword_count;
+					case "laser sword":
+						itemLimit = this.laser_sword_count;
+					case "machine gun":
+						itemLimit = this.machine_gun_count;
+					case "bomb":
+						itemLimit = this.bomb_count;
+				}
+				
+				// Get item bias probablity -- spawn item
+				if (ITEM_SPAWN_LIMITS[randItem.name] != itemLimit)
+					if (Math.floor(Math.random() * 101) <= ITEM_PROBS[randItem.name])
+						SpawnItem(spawn_cell["r"], spawn_cell["c"]);
 			}
 		}	
 	};
