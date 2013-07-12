@@ -11,6 +11,7 @@ const EAST  = "EAST";
 const SOUTH = "SOUTH";
 const WEST  = "WEST";
 const BLOCKED = "BLOCKED"; //if a cell is a barrier entirely
+const LOCKED = "LOCKED"; //if a cell is open and nothing can be placed there.
 const IMAGE = "IMAGE"; //the image for a wall or barrier
 
 var ITEM_IMAGES = {
@@ -37,18 +38,20 @@ const MAP_EDGE_SPAWN_ZONE = 3; //the game can spawn mobs within MAP_EDGE_SPAWN_Z
 
 const MAP_MAX_BARRIERS = 20;
 const MAP_MIN_BARRIERS = 3;
+const MAP_COWPEN_MIN_DIM = 4; 
+const MAP_COWPEN_MAX_DIM = 8;
 
 //constants used for the flooding algo.
 const UNASSIGNED_FLOOD_DEPTH = Number.MAX_VALUE;
 const MAX_FRONTIER_DEPTH = WINDOW_WIDTH_CELLS*WINDOW_HEIGHT_CELLS;
 
-const PLAYER_IMAGE = "images\\robot.png";
-const COW_IMAGE = "images\\cow.png";
-var ALIEN_IMAGES = [	"images\\Brain Jelly.png",
-						"images\\Young Alien Red-Fire.png",
-						"images\\Jelly.png",
-						"images\\Young Alien.png"];
+const PLAYER_IMAGE = "images/robot.png";
+const COW_IMAGE = "images/cow.png";
+var ALIEN_IMAGES = [	"images/Brain Jelly.png",
+						"images/Young Alien Red-Fire.png",
+						"images/Jelly.png",
+						"images/Young Alien.png"];
 
-var BARRIER_IMAGES = [	"images\\barrier1.png",
-						"images\\barrier2.png",
-						"images\\barrier3.png"];
+var BARRIER_IMAGES = [	"images/barrier1.png",
+						"images/barrier2.png",
+						"images/barrier3.png"];

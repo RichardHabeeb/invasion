@@ -19,7 +19,10 @@ function Map() {
 	this.walls_layer = new Kinetic.Layer();
 	
 	this.GenerateTerrain = function() {
-		var num_barriers = MAP_MIN_BARRIERS+Math.floor(Math.random()*(MAP_MAX_BARRIERS-MAP_MIN_BARRIERS));
+		
+		this.GenerateAnimalPen(this.cow.row, this.cow.col);
+		
+		var num_barriers = MAP_MIN_BARRIERS + Math.floor(Math.random()*(MAP_MAX_BARRIERS-MAP_MIN_BARRIERS));
 		
 		for(var i = 0; i < num_barriers; i++) {
 			var cell = this.GetRandomOpenCell();
@@ -39,6 +42,7 @@ function Map() {
 					SOUTH:	(r == this.size_r-1) ? true : false,
 					WEST:	(c == 0) ? true : false,
 					BLOCKED: false,
+					LOCKED: false,
 					IMAGE:	 new MapCell(this.walls_layer, r, c)
 				};
 			}
@@ -446,21 +450,24 @@ function Map() {
 	
 	
 	this.SetWall = function(row, col, heading) {
+		this.walls[row][col][heading] = true;
+		this.UpdateFenceImage(row, col);
+		
 		if(heading === NORTH) {
-			this.walls[row][col][NORTH] = true;
 			if(row-1 >= 0) this.walls[row-1][col][SOUTH] = true;
+			this.UpdateFenceImage(row-1, col);
 			
 		} else if(heading === EAST) {
-			this.walls[row][col][EAST] = true;
 			if(col+1 < this.size_c) this.walls[row][col+1][WEST] = true;
+			this.UpdateFenceImage(row, col+1);
 			
 		} else if(heading === SOUTH) {
-			this.walls[row][col][SOUTH] = true;
 			if(row+1 < this.size_r) this.walls[row+1][col][NORTH] = true;
+			this.UpdateFenceImage(row+1, col);
 		
 		} else if(heading === WEST) {
-			this.walls[row][col][WEST] = true;
 			if(row-1 >= 0) this.walls[row][col-1][EAST] = true;
+			this.UpdateFenceImage(row, col-1);
 		}
 	};
 	
@@ -474,5 +481,53 @@ function Map() {
 		return true;
 	};
 	
+	this.UpdateFenceImage = function(r, c) {
+		if(r >= 0 && r < this.size_r && c >= 0 && c < this.size_c) {
+			if(this.walls[r][c][NORTH]) this.UpdateFenceImage(r-1, c); //wall images are only south and east.
+			if(this.walls[r][c][WEST]) this.UpdateFenceImage(r, c-1);
+			
+			if(this.walls[r][c][SOUTH] || this.walls[r][c][EAST]) {
+				var image_string = (this.walls[r][c][SOUTH]) ? "images/fence-south" : "images/fence";
+				image_string = (this.walls[r][c][EAST]) ? image_string+"-east.png" : image_string+".png";
+				
+				this.walls[r][c][IMAGE].PushImage(image_string);
+			}
+		}
+	};
+	
+	this.GenerateAnimalPen = function(center_point_r, center_point_c) {
+		var headings = [NORTH,EAST,SOUTH,WEST];
+		
+		//setup cow pen
+		var fence_size_c = MAP_COWPEN_MIN_DIM + Math.floor(Math.random() * (MAP_COWPEN_MAX_DIM - MAP_COWPEN_MIN_DIM));
+		var fence_size_r = MAP_COWPEN_MIN_DIM + Math.floor(Math.random() * (MAP_COWPEN_MAX_DIM - MAP_COWPEN_MIN_DIM));
+		
+		var fence_opening_side = headings[Math.floor(Math.random() * headings.length)];
+		var fence_opening_size = 1;
+		if(fence_opening_side == NORTH || fence_opening_side == SOUTH) 
+			fence_opening_size = 1 + Math.floor(Math.random() * (fence_size_r - 1));
+			
+		if(fence_opening_side == EAST || fence_opening_side == WEST) 
+			fence_opening_size = 1 + Math.floor(Math.random() * (fence_size_c - 1));
+		
+		var start_corner_r = center_point_r-Math.round(fence_size_r/2);
+		var start_corner_c = center_point_c-Math.round(fence_size_c/2);
+		
+		
+		for(var r = start_corner_r; r < start_corner_r+fence_size_r; r++) {
+			if((fence_opening_side == WEST && r > start_corner_r+fence_opening_size-1) || fence_opening_side != WEST) 
+				this.SetWall(r, start_corner_c, WEST);
+				
+			if((fence_opening_side == EAST && r > start_corner_r+fence_opening_size-1) || fence_opening_side != EAST) 
+				this.SetWall(r, start_corner_c+fence_size_c-1, EAST);
+		}
+		for(var c = start_corner_c; c < start_corner_c+fence_size_c; c++) {
+			if((fence_opening_side == NORTH && c > start_corner_c+fence_opening_size-1) || fence_opening_side != NORTH) 
+				this.SetWall(start_corner_r, c, NORTH);
+				
+			if((fence_opening_side == SOUTH && c > start_corner_c+fence_opening_size-1) || fence_opening_side != SOUTH)  
+				this.SetWall(start_corner_r+fence_size_r-1, c, SOUTH);
+		}
+	}
 	
 }
