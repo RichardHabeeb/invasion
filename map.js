@@ -155,6 +155,8 @@ function Map() {
 	};
 	
 	
+	// Can't we just merge this into the generic open cell function?
+	// I don't want to have to create another one of these for random item generation too.
 	this.GetRandomSpawnCell = function() { //This needs improvement...
 		//get random valid starting point.
 		var cell_c = null;
@@ -281,6 +283,9 @@ function Map() {
 		this.monster_count++;
 	};
 	
+	this.SpawnItem = function(r, c) {
+	
+	};
 	
 	this.HandleMonsterSpawning = function() {
 		/* Factors that affect the monster spawning.
@@ -354,7 +359,51 @@ function Map() {
 			var headings = [NORTH,EAST,SOUTH,WEST];
 			this.MoveEntity(this.cow, headings[Math.floor(Math.random()*headings.length)]);
 		}
-	}
+	};
+	
+	
+	this.HandleItemSpawning = function() {
+		/*
+			Similarly to monster spawning we should only have a certain number of items on the map at any time.
+			We'll want to have bias probablities for spawning each item
+			This can be set up as a constant array like everything else
+			
+			-sword = .3
+			-laser sword = .2
+			-machine gun = .1
+			-bomb = .4
+			
+			(need constant) 
+			
+			meaning bombs will spawn the most, as a single use item
+			swords will be slightly better as reusible items followed by the machine gun which should have ammo.
+			
+			The bias probablities will only come into play if an item can be spawned
+			
+			An item *can* be spawned 
+				-if there is an open *valid* space, no groups so this shouldn't be tough
+				
+				-if there is not more than a certain number of that item (Bombs could probably have 2 on the map? This does not include items that have been placed.)
+					So if you drop a bomb as an attack, new bombs can still spawn. We can have a flag to know whether or not the item is dropped.
+					If you kill a monster, it has a probablity to drop from it's inventory. This should not affect normal item spawning probablity.	
+		*/
+		
+		if(this.item_count < TOTAL_ITEM_CAP && Math.random() > (this.item_count/TOTAL_ITEM_CAP )) { 
+		
+			var spawn_cell = this.GreedySearchForValidSpawnCell(1);
+			
+			//valid space
+			if(spawn_cell != null) { 
+				//Get random item
+				var randItem = new Item(ITEM_KEYS[Math.floor((Math.random()*ITEM_KEYS.length))]);
+				/*
+					keep track of number of the current item that had been spawned
+					if it does not exceed it's type limit (need constant)
+						spawn teh item
+				*/
+			}
+		}	
+	};
 	
 	
 	this.FloodMaze = function(row_start, col_start, row_end, col_end) {

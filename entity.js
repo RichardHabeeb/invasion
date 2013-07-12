@@ -5,6 +5,9 @@ function Entity(layer, r, c, target) {
 	this.col = c;
 	this.target = target;
 	
+	var items = new Array();
+	this.currentItem;
+	
 	this.x = (PX_PER_CELL*c)+PX_PER_CELL/2;
 	this.y = (PX_PER_CELL*r)+PX_PER_CELL/2;
 	this.inv = new Inventory();
@@ -91,6 +94,43 @@ function Entity(layer, r, c, target) {
 		this.layer.remove(self.sprite);
 		this.inv.RemoveAll();
 		//drop all items in inventory?
+	}
+	
+	this.EquipItem = function(item)
+	{
+		this.currentItem = item;
+	}
+
+	//Adds the given item to 'inventoy'
+	this.AddItem = function(item) 
+	{
+		this.items.push(item);
+		this.EquipItem(item);
+	}
+
+	//Removes the given item from 'inventory'
+	this.RemoveItem = function(item) 
+	{
+
+		// If it exists...
+		if (array.indexOf(item) != -1) 
+		{
+			// Remove the item at the given index
+			this.items.splice(array.indexOf(item), 1);
+		}
+		
+	}
+
+	this.RemoveAllItems = function()
+	{
+		var length = items.length, 
+			element = null;
+			
+		for (var i = 0; i < length; i++) 
+		{
+			element = items[i];
+			RemoveItem(element);
+		}
 	}
 	
 	

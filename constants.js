@@ -14,6 +14,13 @@ const BLOCKED = "BLOCKED"; //if a cell is a barrier entirely
 const LOCKED = "LOCKED"; //if a cell is open and nothing can be placed there.
 const IMAGE = "IMAGE"; //the image for a wall or barrier
 
+var ITEM_KEYS = [
+	"sword",
+	"laser sword",
+	"machine gun",
+	"bomb"
+]
+
 var ITEM_IMAGES = {
 	"sword" : "images\\sword.png"
 };
@@ -31,6 +38,8 @@ var ITEM_ANIMATIONS = {
 		easing: 	Kinetic.Easings.Linear}))
 };
 */
+
+const TOTAL_ITEM_CAP = 10;
 
 const TOTAL_MOB_CAP = 30; 
 const TOTAL_MOB_SPAWN_GROUP = 5; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)
