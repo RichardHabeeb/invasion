@@ -57,6 +57,7 @@ function Item(key, map_layer, animation_layer)
 		} else 	{
 			self.map_sprite.setPosition(this.x_map, this.y_map);
 			self.map_sprite.show();
+			self.MapHoverAnimation.start();	
 		}
 		self.map_layer.add(self.map_sprite);
 		self.map_layer.draw();
@@ -111,6 +112,13 @@ function Item(key, map_layer, animation_layer)
 		this.is_visible_on_map = true;
 		this.SetMapRCXY(r, c);
 		this.map_sprite.show();
+		if(this.map_image_loaded) this.MapHoverAnimation.start();
+	};
+	
+	this.HideImageOnMap = function(r, c) {
+		this.is_visible_on_map = false;
+		this.map_sprite.hide();
+		this.MapHoverAnimation.stop();
 	};
 	
 	this.FaceHeading = function(heading) {
@@ -166,6 +174,21 @@ function Item(key, map_layer, animation_layer)
     }, this.animation_layer);
 	
 	
+	
+	
+	
+	//Map item hover
+	this.map_hover_period = 3000;
+	this.StopMapHoverAnimation = function() {
+		if(self.is_animating) {
+			self.MapHoverAnimation.stop();
+			self.SetMapRCXY(self.row_map, self.col_map);
+		}
+	};
+	this.MapHoverAnimation = new Kinetic.Animation(function(frame) {
+		
+		self.map_sprite.setY(self.y_map-3*Math.sin(frame.time * 2 * Math.PI / self.map_hover_period));
+    }, this.map_layer);
 
 	
 	
