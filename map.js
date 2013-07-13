@@ -181,7 +181,9 @@ function Map() {
 						this.walls[cell_r][cell_c][WEST]
 					) &&
 					!this.walls[cell_r][cell_c][BLOCKED] &&
-					this.entities[cell_r][cell_c] == null
+					this.entities[cell_r][cell_c] == null &&
+					this.items[cell_r][cell_c] == null
+					
 				);
 	};
 	
@@ -196,7 +198,10 @@ function Map() {
 					!this.walls[cell_r][cell_c][SOUTH]   && 
 					!this.walls[cell_r][cell_c][WEST]    &&
 					!this.walls[cell_r][cell_c][BLOCKED] &&
-					this.entities[cell_r][cell_c] == null
+					this.entities[cell_r][cell_c] == null &&
+					this.items[cell_r][cell_c] == null
+					
+					
 				);
 	};
 	
@@ -459,7 +464,7 @@ function Map() {
 				
 				
 				// Get item bias probablity -- spawn item
-				if (ITEM_SPAWN_LIMITS[randItem.key] != randItem.item_limit)
+				if (items_count[randItem.key] != randItem.item_limit)
 				{
 					if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100)) {
 						randItem.ShowImageOnMap(spawn_cell["r"], spawn_cell["c"]);

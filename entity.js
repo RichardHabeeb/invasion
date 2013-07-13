@@ -181,7 +181,7 @@ function Entity(layer, r, c, target) {
 	
 	this.OnDeath = function() {
 		this.sprite.destroy();
-		this.HandleDrops();
+		return this.HandleDrops();
 	}
 	
 	this.EquipItem = function(item)
@@ -213,24 +213,36 @@ function Entity(layer, r, c, target) {
 	{
 		for (var i = 0; i < this.items.length; i++)
 		{
-			switch(this.items[i].key)
+			var currItem = this.items[i];
+			switch(currItem.key)
 			{
 				case "TAZER": 
-					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100))
-						this.items[i].ShowImageOnMap(this.row, this.col);
-						return;
+					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100) 
+					&& this.items[i].parent.items_count[this.items[i].key] != ITEM_SPAWN_LIMITS[this.items[i].key] 
+					&& this.items[i].parent.IsValidOpenCell(this.row, this.col)) {
+						return this.items[i].ShowImageOnMap(this.row, this.col);
+					}
+						
 				case "LASER_VISION":
-					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100))
-						this.items[i].ShowImageOnMap(this.row, this.col);
-						return;
+					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100) 
+					&& this.items[i].parent.items_count[this.items[i].key] != ITEM_SPAWN_LIMITS[this.items[i].key] 
+					&& this.items[i].parent.IsValidOpenCell(this.row, this.col)) {
+						return this.items[i].ShowImageOnMap(this.row, this.col);
+					}
+
 				case "REPAIR_KIT":
-					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100))
-						this.items[i].ShowImageOnMap(this.row, this.col);
-						return;
+					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100) 
+					&& this.items[i].parent.items_count[this.items[i].key] != ITEM_SPAWN_LIMITS[this.items[i].key] 
+					&& this.items[i].parent.IsValidOpenCell(this.row, this.col)) {
+						return this.items[i].ShowImageOnMap(this.row, this.col);
+					}
+						
 				case "BOMB":
-					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100))
-						this.items[i].ShowImageOnMap(this.row, this.col);
-						return;
+					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100) 
+					&& this.items[i].parent.items_count[this.items[i].key] != ITEM_SPAWN_LIMITS[this.items[i].key] 
+					&& this.items[i].parent.IsValidOpenCell(this.row, this.col)) {
+						return this.items[i].ShowImageOnMap(this.row, this.col);
+					}
 			}
 		}
 	}
