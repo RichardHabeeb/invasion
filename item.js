@@ -114,11 +114,12 @@ function Item(key, map_layer, animation_layer, parent)
 		this.is_visible_on_map = true;
 		this.SetMapRCXY(r, c);
 		this.map_sprite.show();
+		this.parent.items[r][c] = self;
 		if(this.map_image_loaded) this.MapHoverAnimation.start();
 		return self;
 	};
 	
-	this.HideImageOnMap = function(r, c) {
+	this.HideImageOnMap = function() {
 		this.is_visible_on_map = false;
 		this.map_sprite.hide();
 		this.MapHoverAnimation.stop();

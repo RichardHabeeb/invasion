@@ -587,8 +587,13 @@ function Map() {
 					this.entities[entity.row][entity.col] = entity;
 					
 					//check for items in this square if player
+					//var currItem = this.items[entity.row][entity.col];
 					if(entity.type == PLAYER && this.items[entity.row][entity.col] != null) {
-						
+						entity.AddItem(this.items[entity.row][entity.col]);
+						this.items[entity.row][entity.col].HideImageOnMap();
+						this.items_count[this.items[entity.row][entity.col].key]--;
+						this.item_count--;
+						this.items[entity.row][entity.col] = null;
 						
 					}
 					
