@@ -53,7 +53,7 @@ var LASER_VISION = {
 	name: "Laser Vision",
 	type: EQUIP,
 	icon_image: "images/lazer.png",
-	map_image: "images/lazer.png",
+	map_image: "images/red-orb.png",
 	animation_image: "images/lazer.png", 
 	animation_type: "BLINK",
 	animation_duration: 1000,

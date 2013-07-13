@@ -318,6 +318,9 @@ function Map() {
 	
 	this.SpawnMob = function(r, c) {
 		var mob = new Entity(this.monster_layer, r, c, this.cow);
+		var item = this.ProbablyGetItem();
+		if (item != null)
+			mob.AddItem(item);
 		mob.move_time = 1;
 		mob.type = MOB;
 		mob.imageObj.src = ALIEN_IMAGES[Math.floor(Math.random()*ALIEN_IMAGES.length)];

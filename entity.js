@@ -211,25 +211,25 @@ function Entity(layer, r, c, target) {
 
 	this.HandleDrops = function()
 	{
-		for (var i = 0; i < items.length; i++)
+		for (var i = 0; i < this.items.length; i++)
 		{
-			switch(items[i].key)
+			switch(this.items[i].key)
 			{
 				case "TAZER": 
-					if (ITEM_PROBS[items[i].key] <= Math.floor(Math.random() * 100))
-						items[i].ShowImageOnMap(this.row, this.col);
+					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100))
+						this.items[i].ShowImageOnMap(this.row, this.col);
 						return;
 				case "LASER_VISION":
-					if (ITEM_PROBS[items[i].key] <= Math.floor(Math.random() * 100))
-						items[i].ShowImageOnMap(this.row, this.col);
+					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100))
+						this.items[i].ShowImageOnMap(this.row, this.col);
 						return;
 				case "REPAIR_KIT":
-					if (ITEM_PROBS[items[i].key] <= Math.floor(Math.random() * 100))
-						items[i].ShowImageOnMap(this.row, this.col);
+					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100))
+						this.items[i].ShowImageOnMap(this.row, this.col);
 						return;
 				case "BOMB":
-					if (ITEM_PROBS[items[i].key] <= Math.floor(Math.random() * 100))
-						items[i].ShowImageOnMap(this.row, this.col);
+					if (ITEM_PROBS[this.items[i].key] <= Math.floor(Math.random() * 100))
+						this.items[i].ShowImageOnMap(this.row, this.col);
 						return;
 			}
 		}
