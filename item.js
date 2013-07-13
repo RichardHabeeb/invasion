@@ -51,8 +51,12 @@ function Item(key, map_layer, animation_layer)
 	};
 	
 	this.map_image.onload = function() {
-		if(!this.is_visible_on_map) 	self.map_sprite.hide();
-		else 							self.map_sprite.show();
+		if(!self.is_visible_on_map) 	{
+			self.map_sprite.hide();
+		} else 	{
+			self.map_sprite.setPosition(this.x_map, this.y_map);
+			self.map_sprite.show();
+		}
 		self.map_layer.add(self.map_sprite);
 		self.map_layer.draw();
 		self.map_image_loaded = true;
@@ -90,7 +94,9 @@ function Item(key, map_layer, animation_layer)
 		this.x_map = (PX_PER_CELL*c)+PX_PER_CELL/2;
 		this.y_map = (PX_PER_CELL*r)+PX_PER_CELL/2;
 		this.map_sprite.setPosition(this.x_map, this.y_map);
-		this.map_layer.draw();
+		if(this.map_image_loaded) {
+			this.map_layer.draw();
+		}
 	};
 	
 	this.SetAnimXY = function (x, y) {
