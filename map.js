@@ -23,7 +23,7 @@ function Map() {
 	this.monster_count = 0;
 	this.item_count = 0;
 	
-	var items_count = {
+	this.items_count = {
 		"TAZER" : 0,
 		"LASER_VISION" : 0,
 		"REPAIR_KIT" : 0,
@@ -106,7 +106,7 @@ function Map() {
 		this.player.type = PLAYER;
 		this.player.health = 100;
 		this.player.imageObj.src = PLAYER_IMAGE;
-		this.player.AddItem(new Item("TAZER", this.items_layer, this.anim_layer));
+		this.player.AddItem(new Item("TAZER", this.items_layer, this.anim_layer, this));
 	};
 	
 	
@@ -415,7 +415,7 @@ function Map() {
 	
 	
 	this.ProbablyGetItem = function() {
-		var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer);
+		var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer, this);
 		switch(randItem.key)
 		{
 			case "TAZER": 
@@ -460,16 +460,16 @@ function Map() {
 			//valid space
 			if(spawn_cell != null) { 
 				//Get random item
-				var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer);
+				var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer, this);
 				
 				
 				// Get item bias probablity -- spawn item
-				if (items_count[randItem.key] != randItem.item_limit)
+				if (this.items_count[randItem.key] != randItem.item_limit)
 				{
 					if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100)) {
 						randItem.ShowImageOnMap(spawn_cell["r"], spawn_cell["c"]);
-						items_count[randItem.key]++;
-						item_count++;
+						this.items_count[randItem.key]++;
+						this.item_count++;
 					}
 						
 				}
