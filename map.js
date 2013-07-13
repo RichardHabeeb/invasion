@@ -138,7 +138,10 @@ function Map() {
 			for(var i = 0; i < cells_affected.length; i++) {
 				var ent;
 				if((ent = this.entities[cells_affected[i].r][cells_affected[i].c]) != null)  {
-					ent.Damage(cells_affected[i].damage);
+					if(ent.TakeDamage(cells_affected[i].damage) <= 0) {
+						this.entities[cells_affected[i].r][cells_affected[i].c] = null;
+						this.monster_count--;
+					}
 				}
 			}
 		}

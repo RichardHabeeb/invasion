@@ -152,14 +152,31 @@ function Entity(layer, r, c, target) {
 	}
 	
 	
-	this.Damage = function() {
-	
+	this.TakeDamage = function(amount) {
+		this.health -= amount;
+		
+		this.anim = new Kinetic.Tween({
+			node: this.sprite,
+			opacity: 0.1,
+			rotation: Math.random(),
+			duration: 0.1,
+			easing: Kinetic.Easings.EaseInOut,
+			onFinish: function() {
+				self.anim.reverse();
+				self.anim = null;
+				if(self.health <= 0) self.OnDeath();
+			}
+		});
+		this.anim.play();
+		
+		
+		return this.health;
 	}
+
 	
 	this.OnDeath = function() {
-		this.layer.remove(self.sprite);
-		this.inv.RemoveAll();
-		//drop all items in inventory?
+		this.sprite.destroy();
+		this.RemoveAllItems();
 	}
 	
 	this.EquipItem = function(item)
@@ -189,12 +206,12 @@ function Entity(layer, r, c, target) {
 
 	this.RemoveAllItems = function()
 	{
-		var length = items.length, 
+		var length = this.items.length, 
 			element = null;
 			
 		for (var i = 0; i < length; i++) 
 		{
-			element = items[i];
+			element = this.items[i];
 			RemoveItem(element);
 		}
 	}
