@@ -70,11 +70,11 @@ var REPAIR_KIT = {
 
 var BOMB = {
 	name: "Bomb",
-	type: SINGLE_USE_WEAPON,
+	type: TRAP,
 	icon_image: "images/bomb.png",
 	map_image: "images/bomb.png",
 	animation_image: "images/bomb.png",
-	animation_duration: 3000,
+	animation_duration: 10000,
 	animation_type: "BLINK",
 	melee: false,
 	range: 50,

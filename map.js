@@ -321,10 +321,7 @@ function Map() {
 		this.entities[mob.row][mob.col] = mob;
 		this.monster_count++;
 	};
-	
-	this.SpawnItem = function(r, c) {
-	
-	};
+
 	
 	this.HandleMonsterSpawning = function() {
 		/* Factors that affect the monster spawning.

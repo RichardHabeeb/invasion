@@ -176,7 +176,7 @@ function Entity(layer, r, c, target) {
 	
 	this.OnDeath = function() {
 		this.sprite.destroy();
-		this.RemoveAllItems();
+		this.HandleDrops();
 	}
 	
 	this.EquipItem = function(item)
@@ -204,16 +204,9 @@ function Entity(layer, r, c, target) {
 		
 	}
 
-	this.RemoveAllItems = function()
+	this.HandleDrops = function()
 	{
-		var length = this.items.length, 
-			element = null;
-			
-		for (var i = 0; i < length; i++) 
-		{
-			element = this.items[i];
-			RemoveItem(element);
-		}
+		return this.items;
 	}
 	
 	
