@@ -68,27 +68,49 @@ var REPAIR_KIT = {
 	buff_amount: 100
 };
 
+var BOMB = {
+	name: "Bomb",
+	type: SINGLE_USE_WEAPON,
+	icon_image: "images/Shadow.png",
+	map_image: "images/Shadow.png",
+	animation_image: "images/Shadow.png",
+	animation_duration: 3000,
+	animation_type: "BLINK",
+	melee: false,
+	range: 50,
+	radius: 50,
+	base_damage: 150
+};
+
 var ITEM_SPAWN_LIMITS = {
-	"sword" : 1,
-	"laser sword" : 1,
-	"machine gun" : 1,
-	"bomb" : 3
+	"TAZER" : 1,
+	"LASER_VISION" : 1,
+	"REPAIR_KIT" : 1,
+	"BOMB" : 3
 };
 
 var ITEM_PROBS = {
-	"sword" : 30,
-	"laser sword" : 20,
-	"machine gun" : 10,
-	"bomb" : 40
+	"TAZER" : 30,
+	"LASER_VISION" : 20,
+	"REPAIR_KIT" : 10,
+	"BOMB" : 20
 };
 
 
 var ITEM_DICT = {
 	"TAZER" : TAZER,
 	"LASER_VISION" : LASER_VISION,
-	"REPAIR_KIT" : REPAIR_KIT
+	"REPAIR_KIT" : REPAIR_KIT,
+	"BOMB" : BOMB
 
 };
+
+var ITEM_ARRAY = [
+	"TASER",
+	"LASER_VISION",
+	"REPAIR_KIT",
+	"BOMB"
+];
 
 
 

@@ -21,9 +21,9 @@ function Map() {
 	this.items; //a 2d array of items
 	this.monster_count = 0;
 	this.item_count = 0;
-	this.sword_count = 0;
-	this.laser_sword_count = 0;
-	this.machine_gun_count = 0;
+	this.tazer_count = 0;
+	this.laser_vision_count = 0;
+	this.repair_kit_count = 0;
 	this.bomb_count = 0;
 	this.player;
 	this.cow;
@@ -393,14 +393,6 @@ function Map() {
 		/*
 			Similarly to monster spawning we should only have a certain number of items on the map at any time.
 			We'll want to have bias probablities for spawning each item
-			This can be set up as a constant array like everything else
-			
-			-sword = .3
-			-laser sword = .2
-			-machine gun = .1
-			-bomb = .4
-			
-			(need constant) 
 			
 			meaning bombs will spawn the most, as a single use item
 			swords will be slightly better as reusible items followed by the machine gun which should have ammo.
@@ -422,26 +414,33 @@ function Map() {
 			//valid space
 			if(spawn_cell != null) { 
 				//Get random item
-				var randItem = new Item(ITEM_KEYS[Math.floor((Math.random()*ITEM_KEYS.length))]);
-				var itemLimit;
+				var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length - 1))], this.items_layer, this.anim_layer);
+				var itemLimit = -1;
 				
 				//Get item limit
-				switch(randItem.name)
+				switch(randItem.key)
 				{
-					case "sword": 
-						itemLimit = this.sword_count;
-					case "laser sword":
-						itemLimit = this.laser_sword_count;
-					case "machine gun":
-						itemLimit = this.machine_gun_count;
-					case "bomb":
+					case "TAZER": 
+						itemLimit = this.tazer_count;
+						break;
+					case "LASER_VISION":
+						itemLimit = this.laser_vision_count;
+						break;
+					case "REPAIR_KIT":
+						itemLimit = this.repair_kit_count;
+						break;
+					case "BOMB":
 						itemLimit = this.bomb_count;
 				}
 				
 				// Get item bias probablity -- spawn item
-				if (ITEM_SPAWN_LIMITS[randItem.name] != itemLimit)
-					if (Math.floor(Math.random() * 101) <= ITEM_PROBS[randItem.name])
-						SpawnItem(spawn_cell["r"], spawn_cell["c"]);
+				if (ITEM_SPAWN_LIMITS[randItem.key] != itemLimit)
+				{
+					var test = ITEM_PROBS[randItem.key];
+					var test2 = Math.floor(Math.random() * 100);
+					if (test2 <= test)
+						randItem.ShowImageOnMap(spawn_cell["r"], spawn_cell["c"]);
+				}
 			}
 		}	
 	};

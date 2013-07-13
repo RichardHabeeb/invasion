@@ -68,8 +68,13 @@ keypress.register_combo({
 
 setInterval(function() {
 	current_map.HandleMonsterSpawning();
+	//current_map.HandleItemSpawning();
 	current_map.HandleCowMovement();
-}, 1000); //handle monsters pawning every 1000 ms.
+}, 1000); //handle monsters spawning every 1000 ms.
+
+setInterval(function() {
+	current_map.HandleItemSpawning();
+}, 500);
 
 
 var monster_movement_handler = function() {
