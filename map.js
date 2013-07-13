@@ -423,7 +423,7 @@ function Map() {
 			//valid space
 			if(spawn_cell != null) { 
 				//Get random item
-				var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length - 1))], this.items_layer, this.anim_layer);
+				var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer);
 				var itemLimit = -1;
 				
 				//Get item limit

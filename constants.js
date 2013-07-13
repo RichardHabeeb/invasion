@@ -71,9 +71,9 @@ var REPAIR_KIT = {
 var BOMB = {
 	name: "Bomb",
 	type: SINGLE_USE_WEAPON,
-	icon_image: "images/Shadow.png",
-	map_image: "images/Shadow.png",
-	animation_image: "images/Shadow.png",
+	icon_image: "images/bomb.png",
+	map_image: "images/bomb.png",
+	animation_image: "images/bomb.png",
 	animation_duration: 3000,
 	animation_type: "BLINK",
 	melee: false,
@@ -93,7 +93,7 @@ var ITEM_PROBS = {
 	"TAZER" : 30,
 	"LASER_VISION" : 20,
 	"REPAIR_KIT" : 10,
-	"BOMB" : 20
+	"BOMB" : 90
 };
 
 
