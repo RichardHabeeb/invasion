@@ -106,7 +106,7 @@ var ITEM_DICT = {
 };
 
 var ITEM_ARRAY = [
-	"TASER",
+	"TAZER",
 	"LASER_VISION",
 	"REPAIR_KIT",
 	"BOMB"
