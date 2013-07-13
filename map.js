@@ -3,6 +3,7 @@
  * FILE: map.js
  * AUTHORS: Richard Habeeb, Addison Shaw 
  * TODO:
+ *  -Adjust monster movement flooding to optimize speed.
  *  -Improve terrain generation
  *  -Add background terrain generation
  *  -Fix fence glitches
@@ -132,7 +133,15 @@ function Map() {
 	
 	
 	this.EntityAttack = function(entity) {
-		entity.Attack(this);
+		var cells_affected = entity.Attack();
+		if(cells_affected != null) {
+			for(var i = 0; i < cells_affected.length; i++) {
+				var ent;
+				if((ent = this.entities[cells_affected[i].r][cells_affected[i].c]) != null)  {
+					ent.Damage(cells_affected[i].damage);
+				}
+			}
+		}
 	}
 	
 	
@@ -373,7 +382,7 @@ function Map() {
 		for(var r = 0; r < this.size_r; r++) {
 			for(var c = 0; c < this.size_c; c++) {
 				var mob = this.entities[r][c];
-				if(mob != null && mob.target != null && mob.IsStopped() && Math.random() > 0.5) {
+				if(mob != null && mob.target != null && Math.random() > 0.5 && mob.IsStopped()) {
 					this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, mob.target.row, mob.target.col, false)); //move a mob towards player (untested) (this needs to be the animals instead)
 				}
 			}

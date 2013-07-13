@@ -10,21 +10,22 @@
 function Entity(layer, r, c, target) {
 	var self = this;
 	this.health = 100;
+
 	this.row = r;
-	this.col = c;
+	this.col = c;	
+	this.x = (PX_PER_CELL*c)+PX_PER_CELL/2;
+	this.y = (PX_PER_CELL*r)+PX_PER_CELL/2;
 	this.heading = NORTH;
-	
 	this.target = target;
+	this.attack_damage_bonus = 0;
+	this.level = 0;
 	
 	this.items = new Array();
 	this.currentItem;
-	
-	this.x = (PX_PER_CELL*c)+PX_PER_CELL/2;
-	this.y = (PX_PER_CELL*r)+PX_PER_CELL/2;
 
 	this.move_time = 0.15; //time in tween animation in secs
-	
 	this.time_of_last_hit = (new Date()).getTime(); // update this later using a new Date();
+	
 	
 	this.imageObj = new Image();
 	this.imageObj.src = 'images\\Brain Jelly.png';
@@ -104,26 +105,37 @@ function Entity(layer, r, c, target) {
 		this.heading = heading;
 	}
 	
-	this.Attack = function(parent_map) {
+	this.Attack = function() {
 		if(this.loaded && typeof this.currentItem != "undefined" && !this.currentItem.is_animating && (this.currentItem.type == EQUIP || this.currentItem.type == SINGLE_USE_WEAPON)) {
+			var cells_affected = new Array();
 			if(this.currentItem.type == EQUIP) {
 				if(this.currentItem.melee) {
 					if(this.currentItem.single_direction) {
-					
 						var pos = {x:this.x, y:this.y};
 						
-						if(this.heading == NORTH)
+						if(this.heading == NORTH) {
 							pos.y -= this.currentItem.range*PX_PER_CELL;
-						else if(this.heading == EAST)
+							for(var i = this.row-1; i >= Math.max(this.row-this.currentItem.range, 0); i--) 
+								cells_affected.push({r:i, c:this.col, damage:this.currentItem.base_damage+this.attack_damage_bonus});
+						} else if(this.heading == EAST) {
 							pos.x += this.currentItem.range*PX_PER_CELL;
-						else if(this.heading == SOUTH)
+							for(var i = this.col+1; i <= Math.min(this.col+this.currentItem.range, WINDOW_WIDTH_CELLS); i++) 
+								cells_affected.push({r:this.row, c:i, damage:this.currentItem.base_damage+this.attack_damage_bonus});
+						} else if(this.heading == SOUTH) {
 							pos.y += this.currentItem.range*PX_PER_CELL;
-						else if(this.heading == WEST)
+							for(var i = this.row+1; i <= Math.min(this.row+this.currentItem.range, WINDOW_HEIGHT_CELLS); i++) 
+								cells_affected.push({r:i, c:this.col, damage:this.currentItem.base_damage+this.attack_damage_bonus});
+						} else if(this.heading == WEST) {
 							pos.x -= this.currentItem.range*PX_PER_CELL;
+							for(var i = this.col-1; i >= Math.max(this.col-this.currentItem.range-1, 0); i--) 
+								cells_affected.push({r:this.row, c:i, damage:this.currentItem.base_damage+this.attack_damage_bonus});
+						}
+						
 						
 						this.currentItem.FaceHeading(this.heading);
 						this.currentItem.Animate(pos.x, pos.y);
-					
+						
+						
 					} else {
 						
 						
@@ -133,7 +145,15 @@ function Entity(layer, r, c, target) {
 				
 				}
 			}
+			
+			return cells_affected;
 		}
+		return null;
+	}
+	
+	
+	this.Damage = function() {
+	
 	}
 	
 	this.OnDeath = function() {
