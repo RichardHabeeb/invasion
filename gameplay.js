@@ -78,7 +78,3 @@ var monster_movement_handler = function() {
 }
 monster_movement_handler();
 
-
-
-
-

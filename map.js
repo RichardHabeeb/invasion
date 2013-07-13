@@ -543,17 +543,22 @@ function Map() {
 		var adjacent = this.GetCellInHeading(entity.row,entity.col,heading);
 		
 		if(adjacent["r"] != entity.row || adjacent["c"] != entity.col) {
+		
+			if(entity.loaded && entity.IsStopped()) {
 			
-			if(	this.walls[entity.row][entity.col][heading] === false &&
-				this.walls[adjacent["r"]][adjacent["c"]][BLOCKED] === false &&
-				this.entities[adjacent["r"]][adjacent["c"]] === null &&
-				entity.loaded && entity.IsStopped())
-			{
-				this.entities[entity.row][entity.col] = null;
-				entity.Move(heading);
-				this.entities[entity.row][entity.col] = entity;
-			}
+				if(	this.walls[entity.row][entity.col][heading] === false &&
+					this.walls[adjacent["r"]][adjacent["c"]][BLOCKED] === false &&
+					this.entities[adjacent["r"]][adjacent["c"]] === null
+				)
+				{
+					this.entities[entity.row][entity.col] = null;
+					entity.Move(heading);
+					this.entities[entity.row][entity.col] = entity;
+				} else {
+					entity.FaceHeading(heading);
 				
+				}
+			}
 		}
 			
 

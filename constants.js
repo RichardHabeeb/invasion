@@ -31,11 +31,11 @@ const CONSTRUCTIVE = "CONSTRUCTIVE";
 var TAZER = {
 	name: "Tazer",
 	type: EQUIP,
-	icon: "images/",
+	icon_image: "images/",
 	map_image: "images/",
 	animation_image: "images/tazer-anim.png", 
 	animation_type: "BLINK",
-	animation_duration: 2000,
+	animation_duration: 500,
 	single_direction: true,
 	melee: true,
 	range: 1,
@@ -45,7 +45,7 @@ var TAZER = {
 var LASER_VISION = {
 	name: "Laser Vision",
 	type: EQUIP,
-	icon: "images/",
+	icon_image: "images/",
 	map_image: "images/",
 	animation_image: "images/", 
 	animation_type: "BLINK",
@@ -59,7 +59,7 @@ var LASER_VISION = {
 var REPAIR_KIT = {
 	name: "Repair Kit",
 	type: SINGLE_USE_BUFF,
-	icon: "images/",
+	icon_image: "images/",
 	map_image: "images/",
 	animation_image: "images/", 
 	animation_duration: 0.1,

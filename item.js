@@ -33,6 +33,16 @@ function Item(key, map_layer, animation_layer)
 	this.is_visible_on_map		= false;
 	this.animation_type			= ITEM_DICT[key].animation_type;
 	this.animation_duration		= ITEM_DICT[key].animation_duration;
+	this.heading				= NORTH;
+	
+	//EQUIP PROPERTIES
+	if(this.type == EQUIP) {
+		this.single_direction = ITEM_DICT[key].single_direction;
+		this.melee = ITEM_DICT[key].melee;
+		this.range = ITEM_DICT[key].range;
+		this.base_damage = ITEM_DICT[key].base_damage;
+	}
+	
 
 	this.icon_image.onload = function() {
 		//self.layer.add(self.sprite);
@@ -94,6 +104,22 @@ function Item(key, map_layer, animation_layer)
 		this.map_sprite.show();
 	};
 	
+	this.FaceHeading = function(heading) {
+		if(heading != this.heading) {
+			if(heading == NORTH) {
+				this.animation_sprite.setRotationDeg(270);
+			} else if(heading == EAST) {
+				this.animation_sprite.setRotationDeg(0);
+			} else if(heading == SOUTH) {
+				this.animation_sprite.setRotationDeg(90);
+			} else if(heading == WEST) {
+				this.animation_sprite.setRotationDeg(180);
+			}
+			this.animation_layer.draw();
+			this.heading = heading;
+		}
+	}
+	
 	
 	//This should be improved by a dictionary, but I don't care right now. (I know this is kinda a ghetto way to do this.)
 	this.Animate = function(x, y) {
@@ -106,7 +132,7 @@ function Item(key, map_layer, animation_layer)
 	
 	
 	//BLINK - fade in and out over a period of time
-	this.blink_animation_period_ms = 500;
+	this.blink_animation_period_ms = 200;
 	this.StartBlinkAnimation = function(x, y) {
 		if(!this.is_animating) {
 			this.SetAnimXY(x, y);
@@ -119,8 +145,10 @@ function Item(key, map_layer, animation_layer)
 	
 	this.StopBlinkAnimation = function() {
 		if(self.is_animating) {
-			self.animation_sprite.hide();
 			self.BlinkAnimation.stop();
+			self.animation_sprite.setOpacity(1);
+			self.animation_sprite.hide();
+			self.animation_layer.draw();
 			self.is_animating = false;
 		}
 	};

@@ -12,6 +12,8 @@ function Entity(layer, r, c, target) {
 	this.health = 100;
 	this.row = r;
 	this.col = c;
+	this.heading = NORTH;
+	
 	this.target = target;
 	
 	this.items = new Array();
@@ -49,13 +51,17 @@ function Entity(layer, r, c, target) {
 
 	
 	this.IsStopped = function() {
-		return (this.anim == null || (typeof this.anim === "object" && this.anim.tween._time >= this.anim.tween.duration));
+		return 	(this.anim == null 		  || (typeof this.anim === "object" && this.anim.tween._time >= this.anim.tween.duration)) &&
+				(this.currentItem == null || (typeof this.currentItem === "object" && !this.currentItem.is_animating));
 	}
 
 	
 	
 	this.Move = function(heading) {
 		if(this.loaded && this.IsStopped()) {
+		
+			this.FaceHeading(heading);
+			
 			switch(heading) {
 				case NORTH:
 					this.row -= 1;
@@ -63,7 +69,6 @@ function Entity(layer, r, c, target) {
 					break;
 				case EAST:
 					this.col += 1;
-					this.sprite.setScaleX(Math.abs(this.sprite.getScaleX()));
 					this.x = Math.min(WINDOW_WIDTH_PX, this.x+PX_PER_CELL);
 					break;
 				case SOUTH:
@@ -72,7 +77,6 @@ function Entity(layer, r, c, target) {
 					break;
 				case WEST:
 					this.col -= 1;
-					this.sprite.setScaleX(-Math.abs(this.sprite.getScaleX()));
 					this.x = Math.max(0, this.x-PX_PER_CELL);
 					break;
 			}
@@ -88,11 +92,46 @@ function Entity(layer, r, c, target) {
 		}
 	};
 	
+	this.FaceHeading = function(heading) {
+		
+		if(heading == WEST && heading != this.heading) {
+			this.sprite.setScaleX(-Math.abs(this.sprite.getScaleX()));
+			this.layer.draw();
+		} else if(heading == EAST  && heading != this.heading) {
+			this.sprite.setScaleX(Math.abs(this.sprite.getScaleX()));
+			this.layer.draw();
+		}
+		this.heading = heading;
+	}
+	
 	this.Attack = function(parent_map) {
-		if(this.loaded && this.IsStopped() && typeof this.currentItem != "undefined" && (this.currentItem.type == EQUIP || this.currentItem.type == SINGLE_USE_WEAPON)) {
+		if(this.loaded && typeof this.currentItem != "undefined" && !this.currentItem.is_animating && (this.currentItem.type == EQUIP || this.currentItem.type == SINGLE_USE_WEAPON)) {
 			if(this.currentItem.type == EQUIP) {
-				this.currentItem.Animate(this.x, this.y);
+				if(this.currentItem.melee) {
+					if(this.currentItem.single_direction) {
+					
+						var pos = {x:this.x, y:this.y};
+						
+						if(this.heading == NORTH)
+							pos.y -= this.currentItem.range*PX_PER_CELL;
+						else if(this.heading == EAST)
+							pos.x += this.currentItem.range*PX_PER_CELL;
+						else if(this.heading == SOUTH)
+							pos.y += this.currentItem.range*PX_PER_CELL;
+						else if(this.heading == WEST)
+							pos.x -= this.currentItem.range*PX_PER_CELL;
+						
+						this.currentItem.FaceHeading(this.heading);
+						this.currentItem.Animate(pos.x, pos.y);
+					
+					} else {
+						
+						
+					}
+				} else {
 				
+				
+				}
 			}
 		}
 	}
