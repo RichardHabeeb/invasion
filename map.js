@@ -22,10 +22,14 @@ function Map() {
 	this.items; //a 2d array of items
 	this.monster_count = 0;
 	this.item_count = 0;
-	this.tazer_count = 0;
-	this.laser_vision_count = 0;
-	this.repair_kit_count = 0;
-	this.bomb_count = 0;
+	
+	var items_count = {
+		"TAZER" : 0,
+		"LASER_VISION" : 0,
+		"REPAIR_KIT" : 0,
+		"BOMB" : 0
+	}
+	
 	this.player;
 	this.cow;
 	
@@ -452,31 +456,17 @@ function Map() {
 			if(spawn_cell != null) { 
 				//Get random item
 				var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer);
-				var itemLimit = -1;
 				
-				//Get item limit
-				switch(randItem.key)
-				{
-					case "TAZER": 
-						itemLimit = this.tazer_count;
-						break;
-					case "LASER_VISION":
-						itemLimit = this.laser_vision_count;
-						break;
-					case "REPAIR_KIT":
-						itemLimit = this.repair_kit_count;
-						break;
-					case "BOMB":
-						itemLimit = this.bomb_count;
-				}
 				
 				// Get item bias probablity -- spawn item
-				if (ITEM_SPAWN_LIMITS[randItem.key] != itemLimit)
+				if (ITEM_SPAWN_LIMITS[randItem.key] != randItem.item_limit)
 				{
-					var test = ITEM_PROBS[randItem.key];
-					var test2 = Math.floor(Math.random() * 100);
-					if (test2 <= test)
+					if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100)) {
 						randItem.ShowImageOnMap(spawn_cell["r"], spawn_cell["c"]);
+						items_count[randItem.key]++;
+						item_count++;
+					}
+						
 				}
 			}
 		}	

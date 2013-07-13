@@ -12,6 +12,7 @@ function Item(key, map_layer, animation_layer)
 	this.key 					= key;
 	this.name 					= ITEM_DICT[key].name;
 	this.type 					= ITEM_DICT[key].type;
+	this.item_limit				= ITEM_SPAWN_LIMITS[key];
 	this.icon_image				= new Image();
 	this.map_image 				= new Image();
 	this.animation_image		= new Image();
