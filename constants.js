@@ -92,15 +92,15 @@ var BOMB = {
 var ITEM_SPAWN_LIMITS = {
 	"TAZER" : 1,
 	"LASER_VISION" : 1,
-	"REPAIR_KIT" : 1,
+	"REPAIR_KIT" : 2,
 	"BOMB" : 3
 };
 
 var ITEM_PROBS = {
 	"TAZER" : 30,
 	"LASER_VISION" : 20,
-	"REPAIR_KIT" : 10,
-	"BOMB" : 90
+	"REPAIR_KIT" : 50,
+	"BOMB" : 40
 };
 
 

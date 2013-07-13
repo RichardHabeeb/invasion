@@ -401,6 +401,27 @@ function Map() {
 	};
 	
 	
+	this.ProbablyGetItem = function() {
+		var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer);
+		switch(randItem.key)
+		{
+			case "TAZER": 
+				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
+					return randItem;
+			case "LASER_VISION":
+				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
+					return randItem;
+			case "REPAIR_KIT":
+				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
+					return randItem;
+			case "BOMB":
+				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
+					return randItem;
+		}
+		return null;
+	}
+	
+	
 	this.HandleItemSpawning = function() {
 		/*
 			Similarly to monster spawning we should only have a certain number of items on the map at any time.
