@@ -6,6 +6,7 @@
  *  -all the things.
  **/
  
+ const HUD_HEIGHT = window.getComputedStyle(document.getElementById("GameHud")).getPropertyValue("height");
  
  //ENTITY TYPES
  const PLAYER = "PLAYER";

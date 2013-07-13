@@ -5,7 +5,7 @@
 @brown: #544242;
 @window_x:960px;
 @window_y:640px;
-
+@button-color: #94B84D;
 @game-bg-color: #B3B48E;
 
 @font-face {
@@ -25,6 +25,8 @@
     text-shadow: 2px 2px @black-opaque;
     letter-spacing: -1px;
     color: @color1;
+    font-family: Square;
+    letter-spacing: 0px;
 }
 
 .big-text {
@@ -33,6 +35,14 @@
     text-shadow: 5px 5px @black-opaque;
     letter-spacing: 0px;
     color: @color1;
+}
+
+.comment-text {
+    font-family: Square;
+    letter-spacing: 0px;
+    font-size: 15px;
+    text-shadow: 1px 1px @black-opaque;
+    color: #333;
 }
 
 .standard-shadow(@offset: 5px, @alpha: 0.3) {
@@ -73,6 +83,58 @@ body {
     height:@window_y;
     border:10px solid @color2;
     background-color: @game-bg-color;
+}
+
+#GameHud {
+    .center-div;
+    .rounded-corners;
+    .standard-shadow;
+    height: 50px;
+    width: @window_x;
+    border:10px solid @color2;
+    background-color: @bg;
+    margin-bottom: 5px;
+}
+
+#StartMenu {
+    .center-div;
+    .rounded-corners;
+    .standard-shadow;
+    position:fixed;
+    top: 50%;
+    left: 50%;
+    height: 150px;
+    width: 400px;
+    margin-top: -75px;
+    margin-left: -200px;
+    border: 10px solid @color2;
+    background-color: @game-bg-color;
+    text-align:center;
+    padding-top:10px;
+
+    .button {
+        .rounded-corners;
+        .center-div;
+        .standard-text;
+        box-shadow:5px 5px #669900;
+        background-color: @button-color;
+        width: 200px;
+        height: 30px;
+        text-align:center;
+        margin-top: 10px;
+        padding-top: 5px;
+        cursor:pointer;
+        &:hover {
+            background-color: #9FBF5F;
+        }
+    }
+    
+    div {
+        .comment-text;
+        .center-div;
+        padding-top: 10px;
+        margin-top: 10px;
+    }
 }
 
 #Header {
