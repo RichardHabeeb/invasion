@@ -159,24 +159,25 @@ function Map() {
 	
 	
 	this.IsValidSpawnCell = function(cell_r, cell_c) { //On the map, on the edge. not blocked, not occupied
-		return !( 	cell_r < 0 || 	
-					cell_r >= this.size_r ||
-					cell_c < 0 ||
-					cell_c >= this.size_c ||
+
+		return ( 	cell_r >= 0 && 	
+					cell_r < this.size_r &&
+					cell_c >= 0 &&
+					cell_c < this.size_c &&
 					(	
-						cell_r >= MAP_EDGE_SPAWN_ZONE && 
-						cell_r < this.size_r-MAP_EDGE_SPAWN_ZONE &&
-						cell_c >= MAP_EDGE_SPAWN_ZONE && 
-						cell_c < this.size_r-MAP_EDGE_SPAWN_ZONE
-					) ||
-					(
+						cell_r < MAP_EDGE_SPAWN_ZONE || 
+						cell_r >= this.size_r-MAP_EDGE_SPAWN_ZONE ||
+						cell_c < MAP_EDGE_SPAWN_ZONE ||
+						cell_c >= this.size_c-MAP_EDGE_SPAWN_ZONE
+					) &&
+					!(
 						this.walls[cell_r][cell_c][NORTH] && 
 						this.walls[cell_r][cell_c][EAST] && 
 						this.walls[cell_r][cell_c][SOUTH] && 
 						this.walls[cell_r][cell_c][WEST]
-					) ||
-					this.walls[cell_r][cell_c][BLOCKED] ||
-					this.entities[cell_r][cell_c] != null
+					) &&
+					!this.walls[cell_r][cell_c][BLOCKED] &&
+					this.entities[cell_r][cell_c] == null
 				);
 	};
 	
@@ -589,6 +590,13 @@ function Map() {
 					this.entities[entity.row][entity.col] = null;
 					entity.Move(heading);
 					this.entities[entity.row][entity.col] = entity;
+					
+					//check for items in this square if player
+					if(entity.type == PLAYER && this.items[entity.row][entity.col] != null) {
+						
+						
+					}
+					
 				} else {
 					entity.FaceHeading(heading);
 				
