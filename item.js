@@ -90,12 +90,14 @@ function Item(key, map_layer, animation_layer)
 		this.x_map = (PX_PER_CELL*c)+PX_PER_CELL/2;
 		this.y_map = (PX_PER_CELL*r)+PX_PER_CELL/2;
 		this.map_sprite.setPosition(this.x_map, this.y_map);
+		this.map_layer.draw();
 	};
 	
 	this.SetAnimXY = function (x, y) {
 		this.x_anim = x;
 		this.y_anim = y
 		this.animation_sprite.setPosition(this.x_anim, this.y_anim);
+		this.animation_layer.draw();
 	};
 	
 	this.ShowImageOnMap = function(r, c) {
