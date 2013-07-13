@@ -19,7 +19,7 @@ function Entity(layer, r, c, target) {
 	this.target = target;
 	this.attack_damage_bonus = 0;
 	this.level = 0;
-	
+	this.type;
 	this.items = new Array();
 	this.currentItem;
 
@@ -127,7 +127,7 @@ function Entity(layer, r, c, target) {
 								cells_affected.push({r:i, c:this.col, damage:this.currentItem.base_damage+this.attack_damage_bonus});
 						} else if(this.heading == WEST) {
 							pos.x -= this.currentItem.range*PX_PER_CELL;
-							for(var i = this.col-1; i >= Math.max(this.col-this.currentItem.range-1, 0); i--) 
+							for(var i = this.col-1; i >= Math.max(this.col-this.currentItem.range, 0); i--) 
 								cells_affected.push({r:this.row, c:i, damage:this.currentItem.base_damage+this.attack_damage_bonus});
 						}
 						
@@ -152,7 +152,7 @@ function Entity(layer, r, c, target) {
 	}
 	
 	
-	this.TakeDamage = function(amount) {
+	this.TakeDamage = function(amount, from_entity) {
 		this.health -= amount;
 		
 		this.anim = new Kinetic.Tween({
@@ -168,6 +168,11 @@ function Entity(layer, r, c, target) {
 			}
 		});
 		this.anim.play();
+		
+		if(this.type == MOB) {
+			this.target = from_entity;
+		
+		}
 		
 		
 		return this.health;

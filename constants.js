@@ -5,6 +5,13 @@
  * TODO:
  *  -all the things.
  **/
+ 
+ 
+ //ENTITY TYPES
+ const PLAYER = "PLAYER";
+ const MOB = "MOB";
+ const COW = "COW";
+ 
 
  //MAP CONSTANTS
 const PX_PER_CELL = 32;
@@ -31,8 +38,8 @@ const CONSTRUCTIVE = "CONSTRUCTIVE";
 var TAZER = {
 	name: "Tazer",
 	type: EQUIP,
-	icon_image: "images/",
-	map_image: "images/",
+	icon_image: "images/tazer-anim.png",
+	map_image: "images/blue-orb.png",
 	animation_image: "images/tazer-anim.png", 
 	animation_type: "BLINK",
 	animation_duration: 500,
@@ -45,9 +52,9 @@ var TAZER = {
 var LASER_VISION = {
 	name: "Laser Vision",
 	type: EQUIP,
-	icon_image: "images/",
-	map_image: "images/",
-	animation_image: "images/", 
+	icon_image: "images/lazer.png",
+	map_image: "images/lazer.png",
+	animation_image: "images/lazer.png", 
 	animation_type: "BLINK",
 	animation_duration: 1000,
 	single_direction: true,

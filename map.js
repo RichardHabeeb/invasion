@@ -99,6 +99,7 @@ function Map() {
 	this.SetupPlayer = function() {
 		var spawn_cell = this.GetRandomSpawnCell();
 		this.player = new Entity(this.player_layer, spawn_cell["r"], spawn_cell["c"], null);
+		this.player.type = PLAYER;
 		this.player.health = 100;
 		this.player.imageObj.src = PLAYER_IMAGE;
 		this.player.AddItem(new Item("TAZER", this.items_layer, this.anim_layer));
@@ -108,6 +109,7 @@ function Map() {
 	this.SetupCow = function() {
 		var spawn_cell = this.GetRandomSpawnCell();
 		this.cow = new Entity(this.player_layer, Math.floor(this.size_r/2), Math.floor(this.size_c/2), null);
+		this.cow.type = COW;
 		this.cow.health = 100;
 		this.cow.move_time = 2;
 		this.cow.imageObj.src = COW_IMAGE;
@@ -138,7 +140,7 @@ function Map() {
 			for(var i = 0; i < cells_affected.length; i++) {
 				var ent;
 				if((ent = this.entities[cells_affected[i].r][cells_affected[i].c]) != null)  {
-					if(ent.TakeDamage(cells_affected[i].damage) <= 0) {
+					if(ent.TakeDamage(cells_affected[i].damage, entity) <= 0) {
 						this.entities[cells_affected[i].r][cells_affected[i].c] = null;
 						this.monster_count--;
 					}
@@ -317,6 +319,7 @@ function Map() {
 	this.SpawnMob = function(r, c) {
 		var mob = new Entity(this.monster_layer, r, c, this.cow);
 		mob.move_time = 1;
+		mob.type = MOB;
 		mob.imageObj.src = ALIEN_IMAGES[Math.floor(Math.random()*ALIEN_IMAGES.length)];
 		this.entities[mob.row][mob.col] = mob;
 		this.monster_count++;
