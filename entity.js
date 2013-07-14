@@ -22,6 +22,7 @@ function Entity(layer, r, c, target) {
 	this.type;
 	this.items = new Array();
 	this.currentItem;
+	this.kills = 0;
 
 	this.move_time = 0.15; //time in tween animation in secs
 	this.time_of_last_hit = (new Date()).getTime(); // update this later using a new Date();
@@ -158,7 +159,7 @@ function Entity(layer, r, c, target) {
 		this.anim = new Kinetic.Tween({
 			node: this.sprite,
 			opacity: 0.1,
-			rotation: Math.random(),
+			rotation: (Math.random() > 0.5) ? Math.random() : -Math.random(),
 			duration: 0.1,
 			easing: Kinetic.Easings.EaseInOut,
 			onFinish: function() {

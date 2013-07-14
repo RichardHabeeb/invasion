@@ -47,7 +47,7 @@ var TAZER = {
 	single_direction: true,
 	melee: true,
 	range: 1,
-	base_damage: 50
+	base_damage: 100
 };
 
 var LASER_VISION = {
@@ -124,7 +124,7 @@ var ITEM_ARRAY = [
 
 const TOTAL_ITEM_CAP = 10;
 
-const TOTAL_MOB_CAP = 30; 
+const TOTAL_MOB_CAP = 50; 
 const TOTAL_MOB_SPAWN_GROUP = 5; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)
 const MAP_EDGE_SPAWN_ZONE = 3; //the game can spawn mobs within MAP_EDGE_SPAWN_ZONE spaces of the edge
 

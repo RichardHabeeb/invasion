@@ -142,11 +142,14 @@ function Map() {
 		var cells_affected = entity.Attack();
 		if(cells_affected != null) {
 			for(var i = 0; i < cells_affected.length; i++) {
-				var ent;
-				if((ent = this.entities[cells_affected[i].r][cells_affected[i].c]) != null)  {
-					if(ent.TakeDamage(cells_affected[i].damage, entity) <= 0) {
+				var attacked_ent;
+				if((attacked_ent = this.entities[cells_affected[i].r][cells_affected[i].c]) != null)  {
+					if(attacked_ent.TakeDamage(cells_affected[i].damage, entity) <= 0) {
+						entity.kills++;
 						this.entities[cells_affected[i].r][cells_affected[i].c] = null;
-						this.monster_count--;
+						if(attacked_ent.type == MOB) {
+							this.monster_count--;
+						}
 					}
 				}
 			}
@@ -333,6 +336,7 @@ function Map() {
 			mob.AddItem(item);
 		mob.move_time = 1;
 		mob.type = MOB;
+		mob.health = 50 + Math.floor(Math.random()*this.player.kills*10);
 		mob.imageObj.src = ALIEN_IMAGES[Math.floor(Math.random()*ALIEN_IMAGES.length)];
 		this.entities[mob.row][mob.col] = mob;
 		this.monster_count++;
