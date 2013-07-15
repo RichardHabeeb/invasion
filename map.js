@@ -164,11 +164,9 @@ function Map(hud) {
 	}
 	
 	this.EntityHeal = function(entity) {
-		if (this.items_count["REPAIR_KIT"] > 0) {
-			if (entity.AddHealth(REPAIR_KIT.buff_amount) > 100)
-				entity.Health = 100;
-			
-			this.items_count["REPAIR_KIT"]--;
+		if (entity.single_use_repairs.length > 0) {
+			entity.AddHealth(REPAIR_KIT.buff_amount)
+			this.hud.UpdateStats(entity);
 		}
 	}
 	
@@ -605,13 +603,9 @@ function Map(hud) {
 					if(entity.type == PLAYER && this.items[entity.row][entity.col] != null) {
 						entity.AddItem(this.items[entity.row][entity.col]);
 						this.items[entity.row][entity.col].HideImageOnMap();
-						if (this.items[entity.row][entity.col].key != "TAZER" && this.items[entity.row][entity.col].key != "LASER_VISION")
-						{
-							this.items_count[this.items[entity.row][entity.col].key]--;
-							this.item_count--;
-						}
-						this.items[entity.row][entity.col] = null;
-						
+						this.items_count[this.items[entity.row][entity.col].key]--;
+						this.item_count--;
+						this.items[entity.row][entity.col] = null;	
 					}
 					
 				} else {

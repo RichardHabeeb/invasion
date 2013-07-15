@@ -182,7 +182,9 @@ function Entity(layer, r, c, target) {
 	}
 	
 	this.AddHealth = function(amount) {
-		this.health += amount;
+		if (this.health += amount > 100) {
+			this.health = 100;
+		}
 		
 		/*
 		this.anim = Kinetic.Tween({
