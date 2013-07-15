@@ -1,4 +1,5 @@
 function Hud(stage) {
+	var self = this;
 	this.layer = new Kinetic.Layer();
 	this.stage = stage;
 	this.stage.add(this.layer);
@@ -107,7 +108,21 @@ function Hud(stage) {
 				easing: Kinetic.Easings.BounceEaseInOut
 			});
 			tween.play();
-			this.kills_text.setText(entity.kills);
+			
+			if(parseInt(this.kills_text.attrs.text) != entity.kills) {
+				var tween = new Kinetic.Tween({
+					node: this.kills_text, 
+					duration: 0.1,
+					fontSize: 30,
+					easing: Kinetic.Easings.BounceEaseInOut,
+					onFinish: function() {
+						self.kills_text.setText(entity.kills);
+						tween.reverse();
+					}
+				});
+				tween.play();
+				
+			}
 		}
 		
 		if(entity.type == COW) {
