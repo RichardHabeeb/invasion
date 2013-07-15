@@ -10,7 +10,8 @@
 function Entity(layer, r, c, target) {
 	var self = this;
 	this.health = 100;
-
+	this.max_health = 100;
+	this.hud = null;
 	this.row = r;
 	this.col = c;	
 	this.x = (PX_PER_CELL*c)+PX_PER_CELL/2;
@@ -155,7 +156,7 @@ function Entity(layer, r, c, target) {
 	
 	this.TakeDamage = function(amount, from_entity) {
 		this.health -= amount;
-		
+
 		this.anim = new Kinetic.Tween({
 			node: this.sprite,
 			opacity: 0.1,

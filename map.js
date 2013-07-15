@@ -13,8 +13,8 @@
  *  -change the ["r"] stuff to .r
  **/
 
-function Map() {
-	this.number_of_updates = 0;
+function Map(hud) {
+	this.hud = hud;
 	this.size_r = WINDOW_HEIGHT_CELLS;
 	this.size_c = WINDOW_WIDTH_CELLS;
 	this.entities; //a 2d array of monster entities
@@ -100,11 +100,13 @@ function Map() {
 	};
 	
 	
-	this.SetupPlayer = function() {
+	this.SetupPlayer = function(hud) {
 		var spawn_cell = this.GetRandomSpawnCell();
 		this.player = new Entity(this.player_layer, spawn_cell["r"], spawn_cell["c"], null);
 		this.player.type = PLAYER;
+		this.player.hud = hud;
 		this.player.health = 100;
+		this.player.max_health = 100;
 		this.player.imageObj.src = PLAYER_IMAGE;
 		this.player.AddItem(new Item("TAZER", this.items_layer, this.anim_layer, this));
 	};
@@ -114,7 +116,8 @@ function Map() {
 		var spawn_cell = this.GetRandomSpawnCell();
 		this.cow = new Entity(this.player_layer, Math.floor(this.size_r/2), Math.floor(this.size_c/2), null);
 		this.cow.type = COW;
-		this.cow.health = 100;
+		this.cow.health = 1000;
+		this.cow.max_health = 1000;
 		this.cow.move_time = 2;
 		this.cow.imageObj.src = COW_IMAGE;
 	};
@@ -151,9 +154,13 @@ function Map() {
 							this.monster_count--;
 						}
 					}
+					
+					if(attacked_ent.type == PLAYER || attacked_ent.type == COW) this.hud.UpdateStats(attacked_ent);
 				}
 			}
 		}
+		
+		if(entity.type == PLAYER || entity.type == COW) this.hud.UpdateStats(entity);
 	}
 	
 	
@@ -337,6 +344,7 @@ function Map() {
 		mob.move_time = 1;
 		mob.type = MOB;
 		mob.health = 50 + Math.floor(Math.random()*this.player.kills*10);
+		mob.max_health = mob.health;
 		mob.imageObj.src = ALIEN_IMAGES[Math.floor(Math.random()*ALIEN_IMAGES.length)];
 		this.entities[mob.row][mob.col] = mob;
 		this.monster_count++;

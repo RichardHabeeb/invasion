@@ -3,24 +3,30 @@
  * FILE: gameplay.js
  * AUTHORS: Richard Habeeb, Addison Shaw 
  * TODO:
- *  -Setup attacking key combos
- *	-Setup pregame menu / pause menu
  *  -Do all the things.
  **/
+
  
+ 
+ 
+//SETUP HUD
+var hud_stage = new Kinetic.Stage({
+	container: 'GameHud',
+	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
+	height: HUD_HEIGHT
+});
+var hud_top = new Hud(hud_stage);
+
+ 
+ 
+ //SETUP MAP
 var window_stage = new Kinetic.Stage({
 	container: 'GameWindow',
 	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
 	height: WINDOW_HEIGHT_CELLS*PX_PER_CELL
 });
 
-var hud_stage = new Kinetic.Stage({
-	container: 'GameHud',
-	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
-	height: HUD_HEIGHT
-});
-
-var current_map = new Map();
+var current_map = new Map(hud_top);
 current_map.SetupMapOnStage(window_stage);
 current_map.SetupWalls();
 current_map.SetupEntities();
@@ -30,10 +36,16 @@ current_map.SetupPlayer();
 current_map.GenerateTerrain();
 
 
-//pause here!
+
+
+
+
+
+
+//INITIAL START GAME WINDOW
+var paused = true;
 var top_layer = new Kinetic.Layer();
 window_stage.add(top_layer);
-
 var screen_cover = new Kinetic.Rect({
 	x: 0,
 	y: 0,
@@ -41,25 +53,21 @@ var screen_cover = new Kinetic.Rect({
 	height: WINDOW_WIDTH_CELLS*PX_PER_CELL,
 	fill: "black",
 	opacity: 0.5
-	
-
 });
-
 top_layer.add(screen_cover);
 top_layer.draw();
 
-var paused = true;
-
 function startGame() {
-
 	paused = false;
 	document.getElementById("StartMenu").style.display = "none";
 	screen_cover.hide();
 	top_layer.draw();
+	hud_top.layer.draw(); //this is done to get the fonts to work
 }
 
 
-//handle holding of keys better than standard DOM.
+
+//HANDLE KEYBOARD EVENTS
 var w_pressed = false;
 var a_pressed = false;
 var s_pressed = false;
@@ -72,7 +80,6 @@ setInterval(function() {
 		if(d_pressed) current_map.MoveEntity(current_map.player, EAST);
 	}
 }, 10); //poll keypress flags every ten ms.
-
 
 keypress.register_combo({
     "keys"              : "w",
@@ -104,20 +111,20 @@ keypress.register_combo({
 });
 
 
+
+//GAME TIMERS AND "INTERRUPTS"
 setInterval(function() {
 	if(!paused) {
 		current_map.HandleMonsterSpawning();
-		//current_map.HandleItemSpawning();
 		current_map.HandleCowMovement();
 	}
-}, 1000); //handle monsters spawning every 1000 ms.
+}, 1000);
 
 setInterval(function() {
 	if(!paused) {
 		current_map.HandleItemSpawning();
 	}
 }, 500);
-
 
 var monster_movement_handler = function() {
 	if(!paused) {
