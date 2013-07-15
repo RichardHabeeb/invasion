@@ -7,6 +7,22 @@
  **/
 
  
+
+//SETUP OVERGAME FEATURES
+var paused = true;
+var screen_cover = new Kinetic.Rect({
+	x: 0,
+	y: 0,
+	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
+	height: WINDOW_WIDTH_CELLS*PX_PER_CELL,
+	fill: "black",
+	opacity: 0.5
+});
+function GameOver() {
+	paused = true;
+	screen_cover.show();
+}
+
  
  
 //SETUP HUD
@@ -38,22 +54,10 @@ current_map.GenerateTerrain();
 
 
 
-
-
-
-
 //INITIAL START GAME WINDOW
 var paused = true;
 var top_layer = new Kinetic.Layer();
 window_stage.add(top_layer);
-var screen_cover = new Kinetic.Rect({
-	x: 0,
-	y: 0,
-	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
-	height: WINDOW_WIDTH_CELLS*PX_PER_CELL,
-	fill: "black",
-	opacity: 0.5
-});
 top_layer.add(screen_cover);
 top_layer.draw();
 

@@ -152,7 +152,10 @@ function Map(hud) {
 						this.entities[cells_affected[i].r][cells_affected[i].c] = null;
 						if(attacked_ent.type == MOB) {
 							this.monster_count--;
+						} else if(attacked_ent.type == PLAYER || attacked_ent.type == COW) {
+							GameOver();
 						}
+						
 					}
 					
 					if(attacked_ent.type == PLAYER || attacked_ent.type == COW) this.hud.UpdateStats(attacked_ent);
@@ -348,6 +351,8 @@ function Map(hud) {
 		var item = this.ProbablyGetItem();
 		if (item != null)
 			mob.AddItem(item);
+			
+		mob.AddItem(new Item("CROWBAR", this.items_layer, this.anim_layer, this));
 		mob.move_time = 1;
 		mob.type = MOB;
 		mob.health = 50 + Math.floor(Math.random()*this.player.kills*10);
@@ -418,7 +423,14 @@ function Map(hud) {
 			for(var c = 0; c < this.size_c; c++) {
 				var mob = this.entities[r][c];
 				if(mob != null && mob.target != null && Math.random() > 0.5 && mob.IsStopped()) {
-					this.MoveEntity(mob, this.GetNextBestHeading(mob.row, mob.col, mob.target.row, mob.target.col, false)); //move a mob towards player (untested) (this needs to be the animals instead)
+					var next_best_heading = this.GetNextBestHeading(mob.row, mob.col, mob.target.row, mob.target.col, false)
+					var next_best_cell = this.GetCellInHeading(r, c, next_best_heading);
+					
+					this.MoveEntity(mob, next_best_heading); //move a mob towards player (untested) (this needs to be the animals instead)
+					
+					if(next_best_cell["r"] == mob.target.row && next_best_cell["c"] == mob.target.col) {
+						this.EntityAttack(mob);
+					}
 				}
 			}
 		}
@@ -555,7 +567,8 @@ function Map(hud) {
 				if(	
 					!this.walls[row_start][col_start][headings[i]] && 
 					!this.walls[cell["r"]][cell["c"]][BLOCKED] && 
-					(this.entities[cell["r"]][cell["c"]] == null || ignore_entities) &&
+					(this.entities[cell["r"]][cell["c"]] == null || ignore_entities || (cell["r"] == row_end && cell["c"] == col_end)) &&
+					flooded_map[next_best_cell["r"]][next_best_cell["c"]] != UNASSIGNED_FLOOD_DEPTH &&
 					flooded_map[next_best_cell["r"]][next_best_cell["c"]] > flooded_map[cell["r"]][cell["c"]]
 				  ) 
 				{

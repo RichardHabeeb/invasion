@@ -39,8 +39,8 @@ const CONSTRUCTIVE = "CONSTRUCTIVE";
 var TAZER = {
 	name: "Tazer",
 	type: EQUIP,
-	icon_image: "images/tazer-anim.png",
-	map_image: "images/blue-orb.png",
+	icon_image: "images/tazer.png",
+	map_image: "images/tazer.png",
 	animation_image: "images/tazer-anim.png", 
 	animation_type: "BLINK",
 	animation_duration: 500,
@@ -50,11 +50,25 @@ var TAZER = {
 	base_damage: 100
 };
 
+var CROWBAR = {
+	name: "Crowbar",
+	type: EQUIP,
+	icon_image: "images/tazer-anim.png",
+	map_image: "images/blue-orb.png",
+	animation_image: "images/small-scratch.png", 
+	animation_type: "BLINK",
+	animation_duration: 1000,
+	single_direction: true,
+	melee: true,
+	range: 1,
+	base_damage: 10
+};
+
 var LASER_VISION = {
 	name: "Laser Vision",
 	type: EQUIP,
 	icon_image: "images/lazer.png",
-	map_image: "images/red-orb.png",
+	map_image: "images/gun.png",
 	animation_image: "images/lazer.png", 
 	animation_type: "BLINK",
 	animation_duration: 1000,
@@ -67,9 +81,9 @@ var LASER_VISION = {
 var REPAIR_KIT = {
 	name: "Repair Kit",
 	type: SINGLE_USE_BUFF,
-	icon_image: "images/lazer.png",
-	map_image: "images/lazer.png",
-	animation_image: "images/lazer.png", 
+	icon_image: "images/repair-kit.png",
+	map_image: "images/repair-kit.png",
+	animation_image: "images/repair-kit.png", 
 	animation_duration: 0.1,
 	animation_type: "NONE",
 	buff_attribute: "health",
@@ -107,6 +121,7 @@ var ITEM_PROBS = {
 
 var ITEM_DICT = {
 	"TAZER" : TAZER,
+	"CROWBAR" : CROWBAR,
 	"LASER_VISION" : LASER_VISION,
 	"REPAIR_KIT" : REPAIR_KIT,
 	"BOMB" : BOMB
@@ -124,7 +139,7 @@ var ITEM_ARRAY = [
 
 const TOTAL_ITEM_CAP = 10;
 
-const TOTAL_MOB_CAP = 50; 
+const TOTAL_MOB_CAP = 30; 
 const TOTAL_MOB_SPAWN_GROUP = 5; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)
 const MAP_EDGE_SPAWN_ZONE = 3; //the game can spawn mobs within MAP_EDGE_SPAWN_ZONE spaces of the edge
 

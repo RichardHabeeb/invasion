@@ -25,6 +25,7 @@ function Entity(layer, r, c, target) {
 	this.single_use_repairs = new Array();
 	this.currentItem;
 	this.kills = 0;
+	this.is_taking_damage = false;
 
 	this.move_time = 0.15; //time in tween animation in secs
 	this.time_of_last_hit = (new Date()).getTime(); // update this later using a new Date();
@@ -156,28 +157,39 @@ function Entity(layer, r, c, target) {
 	
 	
 	this.TakeDamage = function(amount, from_entity) {
-		this.health -= amount;
-
-		this.anim = new Kinetic.Tween({
-			node: this.sprite,
-			opacity: 0.1,
-			rotation: (Math.random() > 0.5) ? Math.random() : -Math.random(),
-			duration: 0.1,
-			easing: Kinetic.Easings.EaseInOut,
-			onFinish: function() {
-				self.anim.reverse();
-				self.anim = null;
-				if(self.health <= 0) self.OnDeath();
-			}
-		});
-		this.anim.play();
-		
-		if(this.type == MOB) {
-			this.target = from_entity;
-		
+		if(this.loaded && !this.is_taking_damage) {
+			this.health -= amount;
+			var init_rotation = this.sprite.getRotation();
+			var init_opacity = this.sprite.getOpacity();
+			this.is_taking_damage = true;
+			this.anim = new Kinetic.Tween({
+				node: this.sprite,
+				opacity: 0.1,
+				rotation: (Math.random() > 0.5) ? Math.random() : -Math.random(),
+				duration: 0.1,
+				easing: Kinetic.Easings.EaseInOut,
+				onFinish: function() {
+				
+					self.anim = new Kinetic.Tween({
+						node: self.sprite,
+						opacity: init_opacity,
+						rotation: init_rotation,
+						duration: 0.1,
+						easing: Kinetic.Easings.EaseInOut,
+						onFinish: function() { self.is_taking_damage = false;}
+					});
+					self.anim.play();
+					
+					if(self.health <= 0) self.OnDeath();
+				}
+			});
+			this.anim.play();
+			
+			if(this.type == MOB) {
+				this.target = from_entity;
+			
+			}	
 		}
-		
-		
 		return this.health;
 	}
 	
@@ -218,7 +230,7 @@ function Entity(layer, r, c, target) {
 	//Adds the given item to 'inventoy'
 	this.AddItem = function(item) 
 	{
-		if (item.key == "TAZER" || item.key == "LASER_VISION") {
+		if (item.type == EQUIP) {
 			this.items.push(item);
 			this.EquipItem(item);
 		} else {
