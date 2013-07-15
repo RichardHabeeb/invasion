@@ -43,7 +43,7 @@ var TAZER = {
 	map_image: "images/tazer.png",
 	animation_image: "images/tazer-anim.png", 
 	animation_type: "BLINK",
-	animation_duration: 500,
+	animation_duration: 300,
 	single_direction: true,
 	melee: true,
 	range: 1,
@@ -107,8 +107,8 @@ var BOMB = {
 var ITEM_SPAWN_LIMITS = {
 	"TAZER" : 1,
 	"LASER_VISION" : 1,
-	"REPAIR_KIT" : 2,
-	"BOMB" : 3
+	"REPAIR_KIT" : 10,
+	"BOMB" : 2
 };
 
 var ITEM_PROBS = {

@@ -255,43 +255,17 @@ function Entity(layer, r, c, target) {
 
 	this.HandleDrops = function()
 	{
-		for (var i = 0; i < this.items.length; i++)
+		for (var i = 0; i < this.single_use_repairs.length; i++)
 		{
-			var currItem = this.items[i];
-			switch(currItem.key)
-			{
-				case "TAZER": 
-					if (ITEM_PROBS[currItem.key] <= Math.floor(Math.random() * 100) 
-					&& currItem.parent.items_count[currItem.key] != ITEM_SPAWN_LIMITS[currItem.key] 
-					&& currItem.parent.IsValidOpenCell(this.row, this.col)) {
-						currItem.parent.items_count[currItem.key]++;
-						return currItem.ShowImageOnMap(this.row, this.col);
-					}
-						
-				case "LASER_VISION":
-					if (ITEM_PROBS[currItem.key] <= Math.floor(Math.random() * 100) 
-					&& currItem.parent.items_count[currItem.key] != ITEM_SPAWN_LIMITS[currItem.key] 
-					&& currItem.parent.IsValidOpenCell(this.row, this.col)) {
-						currItem.parent.items_count[currItem.key]++;
-						return currItem.ShowImageOnMap(this.row, this.col);
-					}
-
-				case "REPAIR_KIT":
-					if (ITEM_PROBS[currItem.key] <= Math.floor(Math.random() * 100) 
-					&& currItem.parent.items_count[currItem.key] != ITEM_SPAWN_LIMITS[currItem.key] 
-					&& currItem.parent.IsValidOpenCell(this.row, this.col)) {
-						currItem.parent.items_count[currItem.key]++;
-						return currItem.ShowImageOnMap(this.row, this.col);
-					}
-						
-				case "BOMB":
-					if (ITEM_PROBS[currItem.key] <= Math.floor(Math.random() * 100) 
-					&& currItem.parent.items_count[currItem.key] != ITEM_SPAWN_LIMITS[currItem.key] 
-					&& currItem.parent.IsValidOpenCell(this.row, this.col)) {
-						currItem.parent.items_count[currItem.key]++;
-						return currItem.ShowImageOnMap(this.row, this.col);
-					}
+			var currItem = this.single_use_repairs[i];
+			
+			if (ITEM_PROBS[currItem.key] <= Math.floor(Math.random() * 100) 
+			&& currItem.parent.items_count[currItem.key] != ITEM_SPAWN_LIMITS[currItem.key] 
+			&& currItem.parent.IsValidOpenCell(this.row, this.col)) {
+				currItem.parent.items_count[currItem.key]++;
+				return currItem.ShowImageOnMap(this.row, this.col);
 			}
+		
 		}
 	}
 	

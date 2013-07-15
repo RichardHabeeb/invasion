@@ -452,9 +452,6 @@ function Map(hud) {
 			case "REPAIR_KIT":
 				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
 					return randItem;
-			case "BOMB":
-				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
-					return randItem;
 		}
 		return null;
 	}
