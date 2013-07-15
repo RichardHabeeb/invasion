@@ -110,6 +110,11 @@ keypress.register_combo({
     "on_keydown"        : function() { current_map.EntityAttack(current_map.player);}
 });
 
+keypress.register_combo({
+	"keys"				: "r",
+	"on_keydown"		: function() { current_map.EntityHeal(current_map.player);}
+});
+
 
 
 //GAME TIMERS AND "INTERRUPTS"

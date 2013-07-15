@@ -22,6 +22,7 @@ function Entity(layer, r, c, target) {
 	this.level = 0;
 	this.type;
 	this.items = new Array();
+	this.single_use_repairs = new Array();
 	this.currentItem;
 	this.kills = 0;
 
@@ -179,6 +180,27 @@ function Entity(layer, r, c, target) {
 		
 		return this.health;
 	}
+	
+	this.AddHealth = function(amount) {
+		this.health += amount;
+		
+		/*
+		this.anim = Kinetic.Tween({
+			node: this.sprite,
+			opacity: 0.5,
+			duration: .3,
+			easing: Kinetic.Easings.EaseInOut,
+			onFinish: function() {
+				self.anim = null;
+			}
+		});
+		this.anim.play();
+		*/
+		
+		this.single_use_repairs.splice(this.single_use_repairs.length - 1, 1);
+		
+		return this.health;
+	}
 
 	
 	this.OnDeath = function() {
@@ -194,8 +216,14 @@ function Entity(layer, r, c, target) {
 	//Adds the given item to 'inventoy'
 	this.AddItem = function(item) 
 	{
-		this.items.push(item);
-		this.EquipItem(item);
+		if (item.key == "TAZER" || item.key == "LASER_VISION") {
+			this.items.push(item);
+			this.EquipItem(item);
+		} else {
+			this.single_use_repairs.push(item);
+		}
+			
+		
 	}
 
 	//Removes the given item from 'inventory'

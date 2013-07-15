@@ -67,13 +67,13 @@ var LASER_VISION = {
 var REPAIR_KIT = {
 	name: "Repair Kit",
 	type: SINGLE_USE_BUFF,
-	icon_image: "images/",
-	map_image: "images/",
-	animation_image: "images/", 
+	icon_image: "images/lazer.png",
+	map_image: "images/lazer.png",
+	animation_image: "images/lazer.png", 
 	animation_duration: 0.1,
 	animation_type: "NONE",
 	buff_attribute: "health",
-	buff_amount: 100
+	buff_amount: 25
 };
 
 var BOMB = {

@@ -163,6 +163,15 @@ function Map(hud) {
 		if(entity.type == PLAYER || entity.type == COW) this.hud.UpdateStats(entity);
 	}
 	
+	this.EntityHeal = function(entity) {
+		if (this.items_count["REPAIR_KIT"] > 0) {
+			if (entity.AddHealth(REPAIR_KIT.buff_amount) > 100)
+				entity.Health = 100;
+			
+			this.items_count["REPAIR_KIT"]--;
+		}
+	}
+	
 	
 	this.GetCellInHeading = function(r,c,heading) {
 				if(heading == NORTH) 	return {"r": Math.max(r-1, 0), 				"c":c};
@@ -430,12 +439,6 @@ function Map(hud) {
 		var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer, this);
 		switch(randItem.key)
 		{
-			case "TAZER": 
-				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
-					return randItem;
-			case "LASER_VISION":
-				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
-					return randItem;
 			case "REPAIR_KIT":
 				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
 					return randItem;
@@ -599,12 +602,14 @@ function Map(hud) {
 					this.entities[entity.row][entity.col] = entity;
 					
 					//check for items in this square if player
-					//var currItem = this.items[entity.row][entity.col];
 					if(entity.type == PLAYER && this.items[entity.row][entity.col] != null) {
 						entity.AddItem(this.items[entity.row][entity.col]);
 						this.items[entity.row][entity.col].HideImageOnMap();
-						this.items_count[this.items[entity.row][entity.col].key]--;
-						this.item_count--;
+						if (this.items[entity.row][entity.col].key != "TAZER" && this.items[entity.row][entity.col].key != "LASER_VISION")
+						{
+							this.items_count[this.items[entity.row][entity.col].key]--;
+							this.item_count--;
+						}
 						this.items[entity.row][entity.col] = null;
 						
 					}
