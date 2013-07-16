@@ -1,7 +1,6 @@
 /**
- * INVASION
- * FILE: map.js
- * AUTHORS: Richard Habeeb, Addison Shaw 
+ * Map.js
+ *
  * TODO:
  *  -Adjust monster movement flooding to optimize speed.
  *  -Improve terrain generation
@@ -10,119 +9,36 @@
  *  -Improve non-flooded heading finding algorithm
  *  -Fix spawn edge zone bug
  *  -handle monster item drops
- *  -change the ["r"] stuff to .r
+ *  -change the ["r"] stuff to .r 
+ * 
+ * @class The map controller
+ * @author Richard Habeeb, Addison Shaw 
  **/
-
 function Map(hud) {
-	this.hud = hud;
-	this.size_r = WINDOW_HEIGHT_CELLS;
-	this.size_c = WINDOW_WIDTH_CELLS;
-	this.entities; //a 2d array of monster entities
-	this.walls; //a 2d array of logical walls and blocks
-	this.items; //a 2d array of items
-	this.monster_count = 0;
-	this.item_count = 0;
-	
-	this.items_count = {
-		"TAZER" : 0,
-		"LASER_VISION" : 0,
-		"REPAIR_KIT" : 0,
-		"BOMB" : 0
-	}
-	
-	this.player;
-	this.cow;
-	
-	this.time_map_created = (new Date()).getTime();
-	
-	this.background_layer = new Kinetic.Layer();
-	this.items_layer = new Kinetic.Layer();
-	this.monster_layer = new Kinetic.Layer();
-	this.player_layer = new Kinetic.Layer();
-	this.walls_layer = new Kinetic.Layer();
-	this.anim_layer = new Kinetic.Layer();
-	
-	
-	this.GenerateTerrain = function() {
-		
-		this.GenerateAnimalPen(this.cow.row, this.cow.col);
-		
-		var num_barriers = MAP_MIN_BARRIERS + Math.floor(Math.random()*(MAP_MAX_BARRIERS-MAP_MIN_BARRIERS));
-		
-		for(var i = 0; i < num_barriers; i++) {
-			var cell = this.GetRandomOpenCell();
-			this.AddBarrier(cell["r"], cell["c"]);
-		}
-	};
-	
-	
-	this.SetupWalls = function() {
-		this.walls = new Array();
-		for(var r = 0; r < this.size_r; r++) {
-			this.walls[r] = new Array();
-			for(var c = 0; c < this.size_c; c++) {
-				this.walls[r][c] = { //Put walls on the outer edges.
-					NORTH: 	(r == 0) ? true : false,
-					EAST:	(c == this.size_c-1) ? true : false,
-					SOUTH:	(r == this.size_r-1) ? true : false,
-					WEST:	(c == 0) ? true : false,
-					BLOCKED: false,
-					LOCKED: false,
-					IMAGE:	 new MapCell(this.walls_layer, r, c)
-				};
-			}
-		}
-	};
+	this.hud 				= hud;
+	this.size_r 			= WINDOW_HEIGHT_CELLS;
+	this.size_c 			= WINDOW_WIDTH_CELLS;
+	this.entities; 			//a 2d array of all entities
+	this.walls; 			//a 2d array of logical walls and blocks
+	this.items; 			//a 2d array of items
+	this.player;			//reference to the player
+	this.cow;				//reference to the cow
+	this.monster_count 		= 0;
+	this.background_layer 	= new Kinetic.Layer();
+	this.items_layer 		= new Kinetic.Layer();
+	this.monster_layer 		= new Kinetic.Layer();
+	this.player_layer 		= new Kinetic.Layer();
+	this.walls_layer 		= new Kinetic.Layer();
+	this.anim_layer 		= new Kinetic.Layer();
+	this.time_map_created 	= (new Date()).getTime();
+	this.item_count 		= 0;
+	this.items_count		= {};
 
-	
-	this.SetupItems = function() {
-		this.items = new Array();
-		this.item_count = 0;
-		for(var r = 0; r < this.size_r; r++) {
-			this.items[r] = new Array();
-			for(var c = 0; c < this.size_c; c++) {
-				this.items[r][c] = null;
-			}
-		}
-	};
-	
-	
-	this.SetupEntities = function() {
-		this.entities = new Array();
-		this.monster_count = 0;
-		for(var r = 0; r < this.size_r; r++) {
-			this.entities[r] = new Array();
-			for(var c = 0; c < this.size_c; c++) {
-				this.entities[r][c] = null;
-			}
-		}
-	
-	};
-	
-	
-	this.SetupPlayer = function(hud) {
-		var spawn_cell = this.GetRandomSpawnCell();
-		this.player = new Entity(this.player_layer, spawn_cell["r"], spawn_cell["c"], null);
-		this.player.type = PLAYER;
-		this.player.hud = hud;
-		this.player.health = 100;
-		this.player.max_health = 100;
-		this.player.imageObj.src = PLAYER_IMAGE;
-		this.player.AddItem(new Item("TAZER", this.items_layer, this.anim_layer, this));
-	};
-	
-	
-	this.SetupCow = function() {
-		var spawn_cell = this.GetRandomSpawnCell();
-		this.cow = new Entity(this.player_layer, Math.floor(this.size_r/2), Math.floor(this.size_c/2), null);
-		this.cow.type = COW;
-		this.cow.health = 1000;
-		this.cow.max_health = 1000;
-		this.cow.move_time = 2;
-		this.cow.imageObj.src = COW_IMAGE;
-	};
-	
-	
+
+	/**
+	 * Configure the map onto the KineticJS stage.
+	 * @param {Kinetic.Stage} stage
+	 */
 	this.SetupMapOnStage = function(stage) {
 		if(typeof stage === "object") {
 			stage.add(this.background_layer);
@@ -141,6 +57,111 @@ function Map(hud) {
 	};
 	
 	
+	/**
+	 * Reinitalize the walls property.
+	 */
+	this.SetupWalls = function() {
+		this.walls = new Array();
+		for(var r = 0; r < this.size_r; r++) {
+			this.walls[r] = new Array();
+			for(var c = 0; c < this.size_c; c++) {
+				this.walls[r][c] = { //Put walls on the outer edges.
+					NORTH: 	(r == 0),
+					EAST:	(c == this.size_c-1),
+					SOUTH:	(r == this.size_r-1),
+					WEST:	(c == 0),
+					BLOCKED: false,
+					LOCKED: false,
+					IMAGE:	 new MapCell(this.walls_layer, r, c)
+				};
+			}
+		}
+	};
+	
+	
+	/**
+	 * Reinitalize the entities property.
+	 */
+	this.SetupEntities = function() {
+		this.entities = new Array();
+		this.monster_count = 0;
+		for(var r = 0; r < this.size_r; r++) {
+			this.entities[r] = new Array();
+			for(var c = 0; c < this.size_c; c++) {
+				this.entities[r][c] = null;
+			}
+		}
+	
+	};
+	
+	
+	/**
+	 * Reinitalize the items_count,item_count,items properties.
+	 */
+	this.SetupItems = function() {
+		for(var item in ITEM_DICT) {
+			this.items_count[item] = 0;
+		}
+	
+		this.items = new Array();
+		this.item_count = 0;
+		for(var r = 0; r < this.size_r; r++) {
+			this.items[r] = new Array();
+			for(var c = 0; c < this.size_c; c++) {
+				this.items[r][c] = null;
+			}
+		}
+	};
+	
+	
+	/**
+	 * Add the cow entity to the map.
+	 */
+	this.SetupCow = function() {
+		var spawn_cell = this.GetRandomSpawnCell();
+		this.cow = new Entity(this.player_layer, Math.floor(this.size_r/2), Math.floor(this.size_c/2), null);
+		this.cow.type = COW;
+		this.cow.health = 1000;
+		this.cow.max_health = 1000;
+		this.cow.move_time = 2;
+		this.cow.imageObj.src = COW_IMAGE;
+	};
+	
+	
+	/**
+	 * Add the player entity to the map.
+	 */
+	this.SetupPlayer = function() {
+		var spawn_cell = this.GetRandomSpawnCell();
+		this.player = new Entity(this.player_layer, spawn_cell["r"], spawn_cell["c"], null);
+		this.player.type = PLAYER;
+		this.player.health = 100;
+		this.player.max_health = 100;
+		this.player.imageObj.src = PLAYER_IMAGE;
+		this.player.AddItem(new Item("TAZER", this.items_layer, this.anim_layer, this));
+	};
+	
+	
+	/**
+	 * Add all the barriers, and the fence to the map.
+	 */
+	this.GenerateTerrain = function() {
+		
+		this.GenerateAnimalPen(this.cow.row, this.cow.col);
+		
+		var num_barriers = MAP_MIN_BARRIERS + Math.floor(Math.random()*(MAP_MAX_BARRIERS-MAP_MIN_BARRIERS));
+		
+		for(var i = 0; i < num_barriers; i++) {
+			var cell = this.GetRandomOpenCell();
+			this.AddBarrier(cell["r"], cell["c"]);
+		}
+	};
+	
+	
+	/**
+	 * Initate and handle an entity attack.
+	 * @param {Entity} entity
+	 */
 	this.EntityAttack = function(entity) {
 		var cells_affected = entity.Attack();
 		if(cells_affected != null) {
@@ -166,6 +187,11 @@ function Map(hud) {
 		if(entity.type == PLAYER || entity.type == COW) this.hud.UpdateStats(entity);
 	}
 	
+	
+	/**
+	 * Initate and handle an entity healing.
+	 * @param {Entity} entity
+	 */
 	this.EntityHeal = function(entity) {
 		if (entity.single_use_repairs.length > 0) {
 			entity.AddHealth(REPAIR_KIT.buff_amount)
