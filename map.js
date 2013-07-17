@@ -200,6 +200,12 @@ function Map(hud) {
 	}
 	
 	
+	/**
+	 * Get the cell in the specified direction
+	 * @param {int} r starting row
+	 * @param {int} c starting col
+	 * @return {"r": int, "c": int}
+	 */
 	this.GetCellInHeading = function(r,c,heading) {
 				if(heading == NORTH) 	return {"r": Math.max(r-1, 0), 				"c":c};
 		else 	if(heading == EAST ) 	return {"r": r, 							"c": Math.min(c+1, this.size_c-1)};
@@ -208,7 +214,13 @@ function Map(hud) {
 	};
 	
 	
-	this.IsValidSpawnCell = function(cell_r, cell_c) { //On the map, on the edge. not blocked, not occupied
+	/**
+	 * Test a cell to see if it is a valid spawn cell (On the map, on the edge. not blocked, not occupied)
+	 * @param {int} cell_r
+	 * @param {int} cell_c
+	 * @return {bool}
+	 */
+	this.IsValidSpawnCell = function(cell_r, cell_c) {
 
 		return ( 	cell_r >= 0 && 	
 					cell_r < this.size_r &&
@@ -233,8 +245,14 @@ function Map(hud) {
 				);
 	};
 	
-	
-	this.IsValidOpenCell = function(cell_r, cell_c) { //on the map, no walls, barriers, or entites.
+
+	/**
+	 * Test a cell to see if it is a valid "open" cell (on the map, no walls, barriers, or entites.)
+	 * @param {int} cell_r
+	 * @param {int} cell_c
+	 * @return {bool}
+	 */
+	this.IsValidOpenCell = function(cell_r, cell_c) {
 		return ( 	(cell_r >= 0 && 	
 					cell_r < this.size_r &&
 					cell_c >= 0 &&
@@ -245,31 +263,34 @@ function Map(hud) {
 					!this.walls[cell_r][cell_c][WEST]    &&
 					!this.walls[cell_r][cell_c][BLOCKED] &&
 					this.entities[cell_r][cell_c] == null &&
-					this.items[cell_r][cell_c] == null
-					
-					
+					this.items[cell_r][cell_c] == null		
 				);
 	};
 	
 	
-	// Can't we just merge this into the generic open cell function?
-	// I don't want to have to create another one of these for random item generation too.
-	this.GetRandomSpawnCell = function() { //This needs improvement...
-		//get random valid starting point.
+	/**
+	 * Get a cell that is able to be spawned on using pure random guessing. (infinite time worst case, but it usually only takes 1-10 iterations)
+	 * @return {"r": int, "c": int}
+	 */
+	this.GetRandomSpawnCell = function() { 
 		var cell_c = null;
 		var cell_r = null;
-		
+
 		while(cell_c == null || cell_r == null || !this.IsValidSpawnCell(cell_r, cell_c))
 		{	 
 			cell_r = Math.floor(Math.random()*this.size_r);
 			cell_c = Math.floor(Math.random()*this.size_c);
 		}
+		
 		return {"r": cell_r, "c": cell_c};
 	};
 	
 	
-	this.GetRandomOpenCell = function() { //This needs improvement...
-		//get random valid starting point.
+	/**
+	 * Get a cell that has no walls or barriers using pure random guessing. (infinite time worst case, but is pretty good in practice.)
+	 * @return {"r": int, "c": int}
+	 */
+	this.GetRandomOpenCell = function() { 
 		var cell_c = null;
 		var cell_r = null;
 		
@@ -282,6 +303,12 @@ function Map(hud) {
 	};
 	
 	
+	/**
+	 * Test adjacent cells and return the number of which of those cells were spawnable
+	 * @param {int} r
+	 * @param {int} c
+	 * @return {int}
+	 */
 	this.GetNumberOfSpawnableAdjacentCells = function(r, c) {
 		var count = 0;
 		if(this.IsValidSpawnCell(r+1, c)) count++;
@@ -292,6 +319,11 @@ function Map(hud) {
 	};
 	
 	
+	/**
+	 * Search for a valid spawn cell group and return the center cell. Uses a greedy algorithm (needs more testing).
+	 * @param {int} size (max of 5)
+	 * @return {"r": int, "c": int} OR null if no cells exist.
+	 */
 	this.GreedySearchForValidSpawnCell = function(size) {
 		
 		var tested_cells = new Array();
@@ -306,18 +338,24 @@ function Map(hud) {
 		pivot_cell_r = temp_cell["r"];
 		pivot_cell_c = temp_cell["c"];
 		
-		var spawn_pivot_cell_valid = (size == 1) ? true : false; // we are good if only one thing needs spawning.
+		var spawn_pivot_cell_valid = (size == 1); // we are good if only one thing needs spawning.
 		
 		while(!spawn_pivot_cell_valid) {
+			
 			tested_cells[pivot_cell_r, pivot_cell_c] = true;
-			if(this.GetNumberOfSpawnableAdjacentCells(pivot_cell_r, pivot_cell_c) >= size-1) spawn_pivot_cell_valid = true;
-			else {
+			
+			if(this.GetNumberOfSpawnableAdjacentCells(pivot_cell_r, pivot_cell_c) >= size-1) {//Check if the cell group is valid
+				
+				spawn_pivot_cell_valid = true;
+			
+			} else { //The next location we will check is the MOST OPEN ADJACENT CELL that we haven't checked yet.
+				
 				var next_r = pivot_cell_r;
 				var next_c = pivot_cell_c;
 				var next_best_num_open_cells = 0;
 				var temp_next;
-				
 				var headings = new Array(NORTH,EAST,SOUTH,WEST);
+				
 				
 				for(var i = 0; i < headings.length; i++) {
 				
@@ -335,43 +373,54 @@ function Map(hud) {
 				}
 				
 				
-				if(next_best_num_open_cells == 0) {
-					//Check to make sure an unchecked spawn cell still exists.
+				if(next_best_num_open_cells == 0) { //If all the adjacent cells are not good for spawning or have been checked (we're trapped)...
+					//then we move into a brute force iteration through cells looking for a good start point. 
+					//This loses some of the true random of this method, but it is rare that we get trapped. (this needs more testing)
+					
+					console.log("Testing: GreedySearchForValidSpawnCell got trapped, looking for a new search-entry point.");
 					var spawn_cells_dont_exist = true;
+					
 					for(var r = 0; r < this.size_r; r++) {
+						
+						
 						for(var c = 0; c < this.size_c; c++) {
+							
 							if(!tested_cells[r][c] && IsValidSpawnCell(r,c)) {
+								
 								spawn_cells_dont_exist = false;
+								next_r = r;
+								next_c = c; //found a new starting point for next iteration.
 								break;
+								
+							} else {
+								tested_cells[r][c] = true;
 							}
 						}
+						
+						if(!spawn_cells_dont_exist) break;
 					}
 					
-					if(spawn_cells_dont_exist) {
-						console.log("No valid spawn cell exists for this size.");
-						return null;
-					}
-					else {
-						var temp_cell;
-						do {
-							temp_cell = this.GetRandomSpawnCell();
-						} while(tested_cells[temp_cell["r"]][temp_cell["c"]]);
-					}
+					if(spawn_cells_dont_exist) return null;
 					
-				} else {
-					pivot_cell_r = next_r;
-					pivot_cell_c = next_c;
+					
 				}
-					
 				
-			
+				pivot_cell_r = next_r;
+				pivot_cell_c = next_c;
+				
 			}
 		}
 		
 		return {"r": pivot_cell_r, "c": pivot_cell_c};
-	};
+		
+	}; //END GreedySearchForValidSpawnCell
 	
 	
+	/**
+	 * Spawn a mob on the map. (This assumes that the passed in cell is valid)
+	 * @param {int} r
+	 * @param {int} c
+	 */
 	this.SpawnMob = function(r, c) {
 		var mob = new Entity(this.monster_layer, r, c, this.cow);
 		var item = this.ProbablyGetItem();
