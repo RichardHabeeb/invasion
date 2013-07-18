@@ -1,24 +1,25 @@
 /**
- * INVASION
- * FILE: mapcell.js
- * AUTHORS: Richard Habeeb, Addison Shaw 
- * TODO:
- *  -handle removal of certain types of graphics. (fence, anim, bg, etc.)
+ * mapcell.js
+ *
+ * @class A map cell stucture. This has a stack of Kinetic Images.
+ * @author Richard Habeeb, Addison Shaw 
  **/
- 
 function MapCell(layer, r, c) {
-	var self = this;
-	this.layer = layer; //this needs to know its layer for stupid reasons.
+	var self 				= this;
+	this.layer 				= layer;
+	this.row 				= r;
+	this.col 				= c;
+	this.x 					= (PX_PER_CELL*c)+PX_PER_CELL/2;
+	this.y 					= (PX_PER_CELL*r)+PX_PER_CELL/2;
+	this.images 			= new Array();
+	this.loaded 			= new Array();
+	this.kinetic_images 	= new Array();
 	
-	this.row = r;
-	this.col = c;
-	this.x = (PX_PER_CELL*c)+PX_PER_CELL/2;
-	this.y = (PX_PER_CELL*r)+PX_PER_CELL/2;
-	
-	this.images = new Array();
-	this.loaded = new Array();
-	this.kinetic_images = new Array();
-	
+		
+	/**
+	 * Add an image to this map cell
+	 * @param {string} image src
+	 */
 	this.PushImage = function(src) {
 	
 		var index = this.images.length;
@@ -37,15 +38,15 @@ function MapCell(layer, r, c) {
 		}));
 		
 		this.images[index].src = src;
+		
+		/**
+		 * This will fire once the image has been loaded. 
+		 */
 		this.images[index].onload = function() {
 			self.layer.add(self.kinetic_images[index]);
 			self.layer.draw();
 			self.loaded[index] = true;
 		};
 		
-	
-	};
-	
-	
-
+	}; //END PushImage
 }

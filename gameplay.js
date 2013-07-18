@@ -1,11 +1,11 @@
 /**
- * INVASION
- * FILE: gameplay.js
- * AUTHORS: Richard Habeeb, Addison Shaw 
+ * gameplay.js
+ *
  * TODO:
- *  -Do all the things.
+ *  all the things.
+ * 
+ * @author Richard Habeeb, Addison Shaw 
  **/
-
  
 
 //SETUP OVERGAME FEATURES
@@ -137,7 +137,7 @@ setInterval(function() {
 
 var monster_movement_handler = function() {
 	if(!paused) {
-		current_map.HandleMonsterMovements();
+		current_map.HandleAlienMovements();
 	}
 	setTimeout(monster_movement_handler, Math.random()*250);
 }

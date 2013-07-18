@@ -1,40 +1,38 @@
 /**
- * INVASION
- * FILE: entity.js
- * AUTHORS: Richard Habeeb, Addison Shaw 
+ * entity.js
+ * 
  * TODO:
  *  -Handle inventory pickups and drops
  *  -Handle attack requests
+ * 
+ * @class An entity structure. This can be a Mob, the Player, or Cow.
+ * @author Richard Habeeb, Addison Shaw 
  **/
-
 function Entity(layer, r, c, target) {
-	var self = this;
-	this.health = 100;
-	this.max_health = 100;
-	this.row = r;
-	this.col = c;	
-	this.x = (PX_PER_CELL*c)+PX_PER_CELL/2;
-	this.y = (PX_PER_CELL*r)+PX_PER_CELL/2;
-	this.heading = NORTH;
-	this.target = target;
-	this.attack_damage_bonus = 0;
-	this.level = 0;
-	this.type;
-	this.items = new Array();
-	this.single_use_repairs = new Array();
-	this.currentItem;
-	this.kills = 0;
-	this.is_taking_damage = false;
-
-	this.move_time = 0.15; //time in tween animation in secs
-	this.time_of_last_hit = (new Date()).getTime(); // update this later using a new Date();
-	
-	
-	this.imageObj = new Image();
-	this.imageObj.src = 'images\\Brain Jelly.png';
-	
-	this.layer = layer; //this needs to know its layer for stupid reasons.
-	this.anim;
+	var self 					= this;
+	this.health 				= 100;
+	this.max_health 			= 100;
+	this.row 					= r;
+	this.col 					= c;	
+	this.x 						= (PX_PER_CELL*c)+PX_PER_CELL/2;
+	this.y 						= (PX_PER_CELL*r)+PX_PER_CELL/2;
+	this.heading 				= NORTH;
+	this.target 				= target;
+	this.attack_damage_bonus 	= 0;
+	this.level 					= 0;
+	this.type;					//Player, Cow, Mob
+	this.move_time 				= 0.15; //time in tween animation in secs
+	this.items 					= new Array();
+	this.single_use_repairs 	= new Array();
+	this.current_equip;			//Equiped item.
+	this.kills 					= 0;
+	this.is_taking_damage 		= false;
+	this.time_of_last_hit 		= (new Date()).getTime();
+	this.imageObj 				= new Image();
+	this.imageObj.src 			= 'images/Brain Jelly.png';
+	this.layer 					= layer; 
+	this.anim					= null;
+	this.loaded 				= false;
 	this.sprite = new Kinetic.Image({
 			x: this.x,
 			y: this.y,
@@ -44,7 +42,10 @@ function Entity(layer, r, c, target) {
 			image: this.imageObj
 	});
 	
-	this.loaded = false;
+	
+	/**
+	 * This will fire once the imageObj has been loaded. 
+	 */
 	this.imageObj.onload = function() {
 		self.layer.add(self.sprite);
 		self.layer.draw();
@@ -52,11 +53,9 @@ function Entity(layer, r, c, target) {
 	};
 	
 	
-
-	
 	this.IsStopped = function() {
 		return 	(this.anim == null 		  || (typeof this.anim === "object" && this.anim.tween._time >= this.anim.tween.duration)) &&
-				(this.currentItem == null || (typeof this.currentItem === "object" && !this.currentItem.is_animating));
+				(this.current_equip == null || (typeof this.current_equip === "object" && !this.current_equip.is_animating));
 	}
 
 	
@@ -109,34 +108,34 @@ function Entity(layer, r, c, target) {
 	}
 	
 	this.Attack = function() {
-		if(this.loaded && typeof this.currentItem != "undefined" && !this.currentItem.is_animating && (this.currentItem.type == EQUIP || this.currentItem.type == SINGLE_USE_WEAPON)) {
+		if(this.loaded && typeof this.current_equip != "undefined" && !this.current_equip.is_animating && (this.current_equip.type == EQUIP || this.current_equip.type == SINGLE_USE_WEAPON)) {
 			var cells_affected = new Array();
-			if(this.currentItem.type == EQUIP) {
-				if(this.currentItem.melee) {
-					if(this.currentItem.single_direction) {
+			if(this.current_equip.type == EQUIP) {
+				if(this.current_equip.melee) {
+					if(this.current_equip.single_direction) {
 						var pos = {x:this.x, y:this.y};
 						
 						if(this.heading == NORTH) {
-							pos.y -= this.currentItem.range*PX_PER_CELL;
-							for(var i = this.row-1; i >= Math.max(this.row-this.currentItem.range, 0); i--) 
-								cells_affected.push({r:i, c:this.col, damage:this.currentItem.base_damage+this.attack_damage_bonus});
+							pos.y -= this.current_equip.range*PX_PER_CELL;
+							for(var i = this.row-1; i >= Math.max(this.row-this.current_equip.range, 0); i--) 
+								cells_affected.push({r:i, c:this.col, damage:this.current_equip.base_damage+this.attack_damage_bonus});
 						} else if(this.heading == EAST) {
-							pos.x += this.currentItem.range*PX_PER_CELL;
-							for(var i = this.col+1; i <= Math.min(this.col+this.currentItem.range, WINDOW_WIDTH_CELLS); i++) 
-								cells_affected.push({r:this.row, c:i, damage:this.currentItem.base_damage+this.attack_damage_bonus});
+							pos.x += this.current_equip.range*PX_PER_CELL;
+							for(var i = this.col+1; i <= Math.min(this.col+this.current_equip.range, WINDOW_WIDTH_CELLS); i++) 
+								cells_affected.push({r:this.row, c:i, damage:this.current_equip.base_damage+this.attack_damage_bonus});
 						} else if(this.heading == SOUTH) {
-							pos.y += this.currentItem.range*PX_PER_CELL;
-							for(var i = this.row+1; i <= Math.min(this.row+this.currentItem.range, WINDOW_HEIGHT_CELLS); i++) 
-								cells_affected.push({r:i, c:this.col, damage:this.currentItem.base_damage+this.attack_damage_bonus});
+							pos.y += this.current_equip.range*PX_PER_CELL;
+							for(var i = this.row+1; i <= Math.min(this.row+this.current_equip.range, WINDOW_HEIGHT_CELLS); i++) 
+								cells_affected.push({r:i, c:this.col, damage:this.current_equip.base_damage+this.attack_damage_bonus});
 						} else if(this.heading == WEST) {
-							pos.x -= this.currentItem.range*PX_PER_CELL;
-							for(var i = this.col-1; i >= Math.max(this.col-this.currentItem.range, 0); i--) 
-								cells_affected.push({r:this.row, c:i, damage:this.currentItem.base_damage+this.attack_damage_bonus});
+							pos.x -= this.current_equip.range*PX_PER_CELL;
+							for(var i = this.col-1; i >= Math.max(this.col-this.current_equip.range, 0); i--) 
+								cells_affected.push({r:this.row, c:i, damage:this.current_equip.base_damage+this.attack_damage_bonus});
 						}
 						
 						
-						this.currentItem.FaceHeading(this.heading);
-						this.currentItem.Animate(pos.x, pos.y);
+						this.current_equip.FaceHeading(this.heading);
+						this.current_equip.Animate(pos.x, pos.y);
 						
 						
 					} else {
@@ -192,23 +191,12 @@ function Entity(layer, r, c, target) {
 		return this.health;
 	}
 	
+	
 	this.AddHealth = function(amount) {
+		
 		if (this.health += amount > 100) {
 			this.health = 100;
 		}
-		
-		/*
-		this.anim = Kinetic.Tween({
-			node: this.sprite,
-			opacity: 0.5,
-			duration: .3,
-			easing: Kinetic.Easings.EaseInOut,
-			onFinish: function() {
-				self.anim = null;
-			}
-		});
-		this.anim.play();
-		*/
 		
 		this.single_use_repairs.splice(this.single_use_repairs.length - 1, 1);
 		
@@ -223,7 +211,7 @@ function Entity(layer, r, c, target) {
 	
 	this.EquipItem = function(item)
 	{
-		this.currentItem = item;
+		this.current_equip = item;
 	}
 
 	//Adds the given item to 'inventoy'
