@@ -43,7 +43,13 @@ function Item(key, map_layer, animation_layer, parent)
 		this.base_damage = ITEM_DICT[key].base_damage;
 	}
 	
-
+	//SINGLE_USE_BUFF PROPERTIES
+	if(this.type == ITEM_TYPES.SINGLE_USE_BUFF) {
+		this.buff_attribute = "health";
+		this.buff_amount = 25;
+	}
+	
+	
 	this.icon_image.onload = function() {
 		//self.layer.add(self.sprite);
 		//self.layer.draw();

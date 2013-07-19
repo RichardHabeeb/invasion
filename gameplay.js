@@ -116,7 +116,7 @@ keypress.register_combo({
 
 keypress.register_combo({
 	"keys"				: "r",
-	"on_keydown"		: function() { current_map.EntityHeal(current_map.player);}
+	"on_keydown"		: function() { current_map.UseSingleUseItem(current_map.player);}
 });
 
 

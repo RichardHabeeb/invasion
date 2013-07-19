@@ -1,9 +1,7 @@
 /**
  * INVASION
- * FILE: constants.js
+ * FILE: globals.js
  * AUTHORS: Richard Habeeb, Addison Shaw 
- * TODO:
- *  -all the things.
  **/
 
 
@@ -19,7 +17,9 @@ const WEST  = "WEST";
 const BLOCKED = "BLOCKED"; //if a cell is a barrier entirely
 const LOCKED = "LOCKED"; //if a cell is open and nothing can be placed there.
 const IMAGE = "IMAGE"; //the image for a wall or barrier
-
+const PLAYER = "PLAYER";
+const MOB = "MOB";
+const COW = "COW";
 
 var ITEM_TYPES = {
 	EQUIP:"EQUIP",
@@ -28,6 +28,8 @@ var ITEM_TYPES = {
 	TRAP: "TRAP",
 	CONSTRUCTIVE: "CONSTRUCTIVE"
 };
+
+
 
 
 const PLAYER_IMAGE = "images/robot.png";

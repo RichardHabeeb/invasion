@@ -204,13 +204,14 @@ function Map(hud, size_r, size_c) {
 	
 	/**
 	 * Initate and handle an entity healing.
+	 * UNFINSIHED!
 	 * @param {Entity} entity
 	 */
-	this.EntityHeal = function(entity) {
-		if (entity.single_use_repairs.length > 0) {
-			entity.AddHealth(REPAIR_KIT.buff_amount)
-			this.hud.UpdateStats(entity);
-		}
+	this.UseSingleUseItem = function(entity) {
+			
+		entity.UseSingleUseItem();
+		this.hud.UpdateStats(entity);
+		
 	};
 	
 	

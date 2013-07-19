@@ -8,12 +8,6 @@
  * @class An entity structure. This can be a Mob, the Player, or Cow.
  * @author Richard Habeeb, Addison Shaw 
  **/
-
- const PLAYER = "PLAYER";
- const MOB = "MOB";
- const COW = "COW";
-
-
 function Entity(layer, r, c, target) {
 	var self 					= this;
 	this.health 				= 100;
@@ -29,7 +23,7 @@ function Entity(layer, r, c, target) {
 	this.type;					//Player, Cow, Mob
 	this.move_time 				= 0.15; //time in tween animation in secs
 	this.items 					= new Array();
-	this.single_use_repairs 	= new Array();
+	this.single_use_items 	= new Array();
 	this.current_equip;			//Equiped item.
 	this.kills 					= 0;
 	this.is_taking_damage 		= false;
@@ -58,14 +52,20 @@ function Entity(layer, r, c, target) {
 		self.loaded = true;
 	};
 	
-	
+	/**
+	 * This will return false if this entity is animating, or it's equip is animating.
+	 * @return {bool}
+	 */
 	this.IsStopped = function() {
 		return 	(this.anim == null 		  || (typeof this.anim === "object" && this.anim.tween._time >= this.anim.tween.duration)) &&
 				(this.current_equip == null || (typeof this.current_equip === "object" && !this.current_equip.is_animating));
-	}
+	};
 
 	
-	
+	/**
+	 * Move and animate this entity in a given heading
+	 * @param {string} heading
+	 */
 	this.Move = function(heading) {
 		if(this.loaded && this.IsStopped()) {
 		
@@ -99,8 +99,13 @@ function Entity(layer, r, c, target) {
 			});
 			this.anim.play();
 		}
-	};
+	}; //END Move
 	
+	
+	/**
+	 * Change the heading field and flip this sprite, if necesary. 
+	 * @param {string} heading
+	 */
 	this.FaceHeading = function(heading) {
 		
 		if(heading == WEST && heading != this.heading) {
@@ -111,8 +116,14 @@ function Entity(layer, r, c, target) {
 			this.layer.draw();
 		}
 		this.heading = heading;
-	}
+	};
 	
+	
+	/**
+	 * Attack. Calculate the cells affected and the damages and return them. Animate the equipped weapon.
+	 * UNFINISHED!
+	 * @return {Array({r: int, c: int, damage: int})}
+	 */
 	this.Attack = function() {
 		if(this.loaded && typeof this.current_equip != "undefined" && !this.current_equip.is_animating && (this.current_equip.type == ITEM_TYPES.EQUIP || this.current_equip.type == ITEM_TYPES.SINGLE_USE_WEAPON)) {
 			var cells_affected = new Array();
@@ -157,9 +168,15 @@ function Entity(layer, r, c, target) {
 			return cells_affected;
 		}
 		return null;
-	}
+	}; //END Attack
 	
 	
+	/**
+	 * Take damage and animate. return the remaining health. Target the attacker. 
+	 * @param {int} amount
+	 * @param {Entity} from entity
+	 * @return {int}
+	 */
 	this.TakeDamage = function(amount, from_entity) {
 		if(this.loaded && !this.is_taking_damage) {
 			this.health -= amount;
@@ -195,18 +212,32 @@ function Entity(layer, r, c, target) {
 			}	
 		}
 		return this.health;
-	}
+	}; //END TakeDamage
 	
 	
-	this.AddHealth = function(amount) {
-		
-		if (this.health += amount > 100) {
-			this.health = 100;
+	/**
+	 * Use the queued up single use item. If the item causes damage, it returns an array of cells affected.
+	 * @return {Array({r: int, c: int, damage: int})}
+	 */
+	this.UseSingleUseItem = function() {
+		if (this.single_use_items.length > 0) {
+			if(this.single_use_items[0].type == ITEM_TYPES.SINGLE_USE_BUFF) {
+				if(this.single_use_items[0].buff_attribute.indexOf("health") !== -1) {
+					
+					this.health = Math.min(this.health+this.single_use_items[0].buff_amount, this.max_health)
+					
+				}
+				
+				this.single_use_items[0].Animate(this.x, this.y);
+				
+
+			}
+			
+			this.single_use_items.splice(0, 1);
+			return null;
+			
+			
 		}
-		
-		this.single_use_repairs.splice(this.single_use_repairs.length - 1, 1);
-		
-		return this.health;
 	}
 
 	
@@ -223,7 +254,7 @@ function Entity(layer, r, c, target) {
 			this.items.push(item);
 			this.EquipItem(item);
 		} else {
-			this.single_use_repairs.push(item);
+			this.single_use_items.push(item);
 		}
 			
 		
@@ -244,7 +275,7 @@ function Entity(layer, r, c, target) {
 
 	this.HandleDrops = function()
 	{
-		return this.single_use_repairs;
+		return this.single_use_items;
 	}
 	
 	
