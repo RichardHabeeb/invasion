@@ -22,8 +22,12 @@ function Map(hud, size_r, size_c) {
 	this.player;					//reference to the player
 	this.cow;						//reference to the cow
 	this.mob_count 					= 0;
-	this.mob_cap					= 30;
-	this.largest_mob_group			= 5; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)
+	this.mob_cap					= 40;
+	this.largest_mob_group			= 10; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)
+	this.horde_states				= ["BUILD", "PEAK", "RESTORE"];
+	this.horde_state				= 0; //BUILD
+	this.horde_state_time			= (new Date()).getTime();
+	this.horde_state_max_time		= 2*60*1000; //ms
 	this.edge_spawn_size_cells		= 3; //the game can spawn mobs within edge_spawn_size_cells spaces of the edge
 	this.max_barriers				= 20;
 	this.min_barriers				= 3;
@@ -235,45 +239,52 @@ function Map(hud, size_r, size_c) {
 	 *  distance of player from the cow
 	 */
 	this.HandleMonsterSpawning = function() {
-
-		//the probability of spawning an alien horde is proportional to the # of aliens available to spawn as well as the time since the player was last damaged.
-		if(this.mob_count < this.mob_cap && Math.random() > (this.mob_count/this.mob_cap )) { 
-			
-			//the number of mobs that are spawned is based in part on the time since the player was last damaged. (always at least one).
-			var number_of_mobs_to_spawn = Math.ceil(Math.random()*Math.min(((new Date()).getTime() - this.player.time_of_last_hit)/(15.0*1000), 1.0)*Math.min(this.mob_cap - this.mob_count, this.largest_mob_group));
-			
-			//search for open area near the edge. greedy style.
-			var spawn_cell = this.GreedySearchForValidSpawnCell(number_of_mobs_to_spawn);
-			if(spawn_cell != null) { 
-			
-				//We found a valid place to spawn our group. Now we spawn!
-				this.SpawnMob(spawn_cell["r"], spawn_cell["c"]);
-				number_of_mobs_to_spawn--;
+		var headings = new Array(NORTH,EAST,SOUTH,WEST);
+		var current_time = (new Date()).getTime();
+		
+		if(current_time - this.horde_state_time > this.horde_state_max_time) {
+			this.horde_state = (this.horde_state+1) % this.horde_states.length;
+			this.horde_state_time = current_time;
+		}
+		
+		
+		if(this.horde_states[this.horde_state] == "BUILD") {
+			var max_mobs = Math.floor(this.mob_cap / 2);
+	
+			//the probability of spawning an alien horde is proportional to the # of aliens available to spawn as well as the time since the player was last damaged.
+			if(this.mob_count < this.mob_cap && Math.random() > (this.mob_count/this.mob_cap )) { 
 				
-				var spawn_cell_area = new Array(NORTH,EAST,SOUTH,WEST);
+				//the number of mobs that are spawned is based in part on the time since the player was last damaged. (always at least one).
+				var number_of_mobs_to_spawn = Math.ceil(Math.random()*Math.min(((new Date()).getTime() - this.player.time_of_last_hit)/(15.0*1000), 1.0)*Math.min(this.mob_cap - this.mob_count, this.largest_mob_group));
+							
+				var number_spawned_already = 0;
+				var queue = [this.GetRandomSpawnCell()];
 				
-				
-				for(var i = 0; i < Math.min(number_of_mobs_to_spawn,spawn_cell_area.length); i++) {
+				while(number_spawned_already < number_of_mobs_to_spawn && queue.length > 0 && queue[0] != null) {
+					var frontier_cell = queue[0];
+					queue.splice(0,1);
 					
-					var roll = Math.floor(Math.random()*spawn_cell_area.length);
-					
-					var spawn_cell_local = this.GetCellInHeading(spawn_cell["r"], spawn_cell["c"],spawn_cell_area[roll]);
-					
-					if((spawn_cell_local["r"] != spawn_cell["r"] || spawn_cell_local["c"] != spawn_cell["c"]) && 
-						this.IsValidSpawnCell(spawn_cell_local["r"], spawn_cell_local["c"])) 
+					if(this.IsValidSpawnCell(frontier_cell["r"], frontier_cell["c"]))
 					{
-						
-						this.SpawnMob(spawn_cell_local["r"], spawn_cell_local["c"]);
-					} else {
-						i--; //yeah this is kinda silly, but it works. This is to make sure we don't keep looking the some direction to spawn a mob.
+						this.SpawnMob(frontier_cell["r"], frontier_cell["c"]);
+						number_spawned_already++;
 					}
 					
-					spawn_cell_area.splice(roll);
-					
-				}
-				
+					for(var i = 0; i < headings.length; i++) {
+						var cell = this.GetCellInHeading(frontier_cell["r"], frontier_cell["c"], headings[i]);
+
+						if(!this.walls[frontier_cell["r"]][frontier_cell["c"]][headings[i]] && this.IsValidSpawnCell(cell["r"], cell["c"]))
+						{	
+							queue.push(cell);
+						}		
+					}
+				} //end while
 			}
 		}
+		
+		
+		
+		
 	}; //END HandleMonsterSpawning
 	
 	
