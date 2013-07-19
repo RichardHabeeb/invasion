@@ -5,10 +5,9 @@
  * TODO:
  *  -all the things.
  **/
-function Item(key, map_layer, animation_layer, parent)
+function Item(key, map_layer, animation_layer)
 {
 	var self 					= this;
-	this.parent					= parent;
 	this.key 					= key;
 	this.name 					= ITEM_DICT[key].name;
 	this.type 					= ITEM_DICT[key].type;
@@ -101,7 +100,6 @@ function Item(key, map_layer, animation_layer, parent)
 		this.x_map = (PX_PER_CELL*c)+PX_PER_CELL/2;
 		this.y_map = (PX_PER_CELL*r)+PX_PER_CELL/2;
 		this.map_sprite.setPosition(this.x_map, this.y_map);
-		this.parent.items[r][c] = self;
 		if(this.map_image_loaded) {
 			this.map_layer.draw();
 		}
@@ -118,7 +116,6 @@ function Item(key, map_layer, animation_layer, parent)
 		this.is_visible_on_map = true;
 		this.SetMapRCXY(r, c);
 		this.map_sprite.show();
-		this.parent.items[r][c] = self;
 		if(this.map_image_loaded) this.MapHoverAnimation.start();
 		return self;
 	};

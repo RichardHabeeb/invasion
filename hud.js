@@ -98,6 +98,7 @@ function Hud(stage) {
 	this.layer.add(this.kills_text_title);
 	
 	
+	//This should queue up animations if it is already animating.
 	this.UpdateStats = function(entity) {
 		
 		if(entity.type == PLAYER) {

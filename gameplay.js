@@ -7,24 +7,6 @@
  * @author Richard Habeeb, Addison Shaw 
  **/
  
-
-//SETUP OVERGAME FEATURES
-var paused = true;
-var screen_cover = new Kinetic.Rect({
-	x: 0,
-	y: 0,
-	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
-	height: WINDOW_WIDTH_CELLS*PX_PER_CELL,
-	fill: "black",
-	opacity: 0.5
-});
-function GameOver() {
-	paused = true;
-	screen_cover.show();
-}
-
- 
- 
 //SETUP HUD
 var hud_stage = new Kinetic.Stage({
 	container: 'GameHud',
@@ -56,6 +38,14 @@ current_map.GenerateTerrain();
 
 //INITIAL START GAME WINDOW
 var paused = true;
+var screen_cover = new Kinetic.Rect({
+	x: 0,
+	y: 0,
+	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
+	height: WINDOW_WIDTH_CELLS*PX_PER_CELL,
+	fill: "black",
+	opacity: 0.5
+});
 var top_layer = new Kinetic.Layer();
 window_stage.add(top_layer);
 top_layer.add(screen_cover);
@@ -68,7 +58,11 @@ function startGame() {
 	top_layer.draw();
 	hud_top.layer.draw(); //this is done to get the fonts to work
 }
-
+function GameOver() {
+	paused = true;
+	screen_cover.show();
+	top_layer.draw();
+}
 
 
 //HANDLE KEYBOARD EVENTS
@@ -111,7 +105,7 @@ keypress.register_combo({
 
 keypress.register_combo({
     "keys"              : "j",
-    "on_keydown"        : function() { current_map.EntityAttack(current_map.player);}
+    "on_keydown"        : function() { current_map.EntityAttack(current_map.player, null);}
 });
 
 keypress.register_combo({
@@ -123,9 +117,13 @@ keypress.register_combo({
 
 //GAME TIMERS AND "INTERRUPTS"
 setInterval(function() {
+	if(current_map.game_over_flag) {
+		GameOver();
+	}
 	if(!paused) {
 		current_map.HandleMonsterSpawning();
 		current_map.HandleCowMovement();
+
 	}
 }, 1000);
 

@@ -36,9 +36,10 @@ function Map(hud, size_r, size_c) {
 	this.spawnable_items_probs		= {"LASER_VISION" : 0.1, "REPAIR_KIT" : 0.5, "BOMB" : 0.2 };
 	this.spawnable_items_limits		= {"LASER_VISION" : 1, "REPAIR_KIT" : 20, "BOMB" : 6 };
 	this.dropable_items				= ["REPAIR_KIT", "BOMB"];
-	this.dropable_items_probs		= {"REPAIR_KIT": 0.1, "BOMB": 0.05};
+	this.dropable_items_probs		= {"REPAIR_KIT": 0.05, "BOMB": 0.02};
 	this.dropables_per_mob			= 3;
 	this.flood_unassigned_depth		= Number.MAX_VALUE;
+	this.game_over_flag				= false; //This flag is polled by gameplay.
 	this.background_layer 			= new Kinetic.Layer();
 	this.items_layer 				= new Kinetic.Layer();
 	this.monster_layer 				= new Kinetic.Layer();
@@ -150,7 +151,7 @@ function Map(hud, size_r, size_c) {
 		this.player.health = 100;
 		this.player.max_health = 100;
 		this.player.imageObj.src = PLAYER_IMAGE;
-		this.player.AddItem(new Item("TAZER", this.items_layer, this.anim_layer, this));
+		this.player.AddItem(new Item("TAZER", this.items_layer, this.anim_layer));
 	};
 	
 	
@@ -171,24 +172,45 @@ function Map(hud, size_r, size_c) {
 	
 	
 	/**
-	 * Initate and handle an entity attack.
+	 * Initate an entity attack, 
 	 * @param {Entity} entity
 	 */
 	this.EntityAttack = function(entity) {
-		var cells_affected = entity.Attack();
+		this.HandleAttackedCells(entity, entity.Attack());
+	};
+	
+	
+	/**
+	 * Initate and handle an entity healing.
+	 * @param {Entity} entity
+	 */
+	this.UseSingleUseItem = function(entity) {
+			
+		this.HandleAttackedCells(entity, entity.UseSingleUseItem());
+		
+		if(entity.type == PLAYER || entity.type == COW) this.hud.UpdateStats(entity);
+		
+	};
+	
+	/**
+	 * Deal out damage to attacked cells, 
+	 * @param {Entity} attacker
+	 * @param {Array({r,c,damage})} entity
+	 */
+	this.HandleAttackedCells = function(attacker, cells_affected) {
 		if(cells_affected != null) {
 			for(var i = 0; i < cells_affected.length; i++) {
 				var attacked_ent;
 				if((attacked_ent = this.entities[cells_affected[i].r][cells_affected[i].c]) != null)  {
-					if(attacked_ent.TakeDamage(cells_affected[i].damage, entity) <= 0) {
+					if(attacked_ent.TakeDamage(cells_affected[i].damage, attacker) <= 0) {
 						//entity attacked just died.
-						entity.kills++;
+						attacker.kills++;
 						this.entities[cells_affected[i].r][cells_affected[i].c] = null;
 						this.HandleDrops(cells_affected[i].r, cells_affected[i].c, attacked_ent.HandleDrops());
 						if(attacked_ent.type == MOB) {
 							this.mob_count--;
 						} else if(attacked_ent.type == PLAYER || attacked_ent.type == COW) {
-							GameOver();
+							this.game_over_flag = true;
 						}
 						
 					}
@@ -198,20 +220,7 @@ function Map(hud, size_r, size_c) {
 			}
 		}
 		
-		if(entity.type == PLAYER || entity.type == COW) this.hud.UpdateStats(entity);
-	};
-	
-	
-	/**
-	 * Initate and handle an entity healing.
-	 * UNFINSIHED!
-	 * @param {Entity} entity
-	 */
-	this.UseSingleUseItem = function(entity) {
-			
-		entity.UseSingleUseItem();
-		this.hud.UpdateStats(entity);
-		
+		if(attacker.type == PLAYER || attacker.type == COW) this.hud.UpdateStats(attacker);
 	};
 	
 	
@@ -294,7 +303,7 @@ function Map(hud, size_r, size_c) {
 			//valid space
 			if(spawn_cell != null) { 
 				//Get random item
-				var randItem = new Item(this.spawnable_items[Math.floor(Math.random()* (this.spawnable_items.length))], this.items_layer, this.anim_layer, this);
+				var randItem = new Item(this.spawnable_items[Math.floor(Math.random()* (this.spawnable_items.length))], this.items_layer, this.anim_layer);
 				
 				
 				// Get item bias probablity -- spawn item
@@ -304,7 +313,7 @@ function Map(hud, size_r, size_c) {
 						randItem.ShowImageOnMap(spawn_cell["r"], spawn_cell["c"]);
 						this.items_count[randItem.key]++;
 						this.item_count++;
-						this.items[spawn_cell["r"]][spawn_cell["r"]] = randItem;
+						this.items[spawn_cell["r"]][spawn_cell["c"]] = randItem;
 					}
 						
 				}
@@ -362,12 +371,12 @@ function Map(hud, size_r, size_c) {
 		for(var j = 0; j < this.dropables_per_mob; j++) {//iterate though the possible drops and possibly pick one. 
 			for(var i = 0; i < this.dropable_items.length; i++) {  
 				if(Math.random() < this.dropable_items_probs[this.dropable_items[i]]) {
-					mob.AddItem(new Item(this.dropable_items[i], this.items_layer, this.anim_layer, this));
+					mob.AddItem(new Item(this.dropable_items[i], this.items_layer, this.anim_layer));
 					break;
 				}
 			}
 		}
-		mob.AddItem(new Item("CROWBAR", this.items_layer, this.anim_layer, this));
+		mob.AddItem(new Item("CROWBAR", this.items_layer, this.anim_layer));
 		
 		mob.imageObj.src = ALIEN_IMAGES[Math.floor(Math.random()*ALIEN_IMAGES.length)];
 		

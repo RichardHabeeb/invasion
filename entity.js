@@ -179,7 +179,7 @@ function Entity(layer, r, c, target) {
 	 */
 	this.TakeDamage = function(amount, from_entity) {
 		if(this.loaded && !this.is_taking_damage) {
-			this.health -= amount;
+			this.health = Math.max(this.health-amount, 0);
 			var init_rotation = this.sprite.getRotation();
 			var init_opacity = this.sprite.getOpacity();
 			this.is_taking_damage = true;
@@ -217,6 +217,7 @@ function Entity(layer, r, c, target) {
 	
 	/**
 	 * Use the queued up single use item. If the item causes damage, it returns an array of cells affected.
+	 * UNFINISHED
 	 * @return {Array({r: int, c: int, damage: int})}
 	 */
 	this.UseSingleUseItem = function() {
@@ -236,43 +237,43 @@ function Entity(layer, r, c, target) {
 			this.single_use_items.splice(0, 1);
 			return null;
 			
-			
 		}
 	}
 
 	
-	
-	this.EquipItem = function(item)
-	{
-		this.current_equip = item;
-	}
-
-	//Adds the given item to 'inventoy'
+	/**
+	 * Adds the given item to inventory, if it is an equip, equip it.
+	 * @param {Item} item
+	 */
 	this.AddItem = function(item) 
 	{
 		if (item.type == ITEM_TYPES.EQUIP) {
 			this.items.push(item);
-			this.EquipItem(item);
+			this.current_equip = item;
 		} else {
 			this.single_use_items.push(item);
 		}
-			
-		
 	}
 
-	//Removes the given item from 'inventory'
+
+	/**
+	 * Removes the given item from 'inventory'
+	 * @param {Item} item
+	 */
 	this.RemoveItem = function(item) 
 	{
-
-		// If it exists...
 		if (array.indexOf(item) != -1) 
 		{
-			// Remove the item at the given index
 			this.items.splice(array.indexOf(item), 1);
 		}
 		
 	}
-
+	
+	
+	/**
+	 * Handle what items are dropped when this entity is dead.
+	 * @return {Array({item})}
+	 */
 	this.HandleDrops = function()
 	{
 		return this.single_use_items;

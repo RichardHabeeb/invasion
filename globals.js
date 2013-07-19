@@ -42,3 +42,5 @@ var ALIEN_IMAGES = [	"images/Brain Jelly.png",
 var BARRIER_IMAGES = [	"images/barrier1.png",
 						"images/barrier2.png",
 						"images/barrier3.png"];
+
+
