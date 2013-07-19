@@ -11,27 +11,42 @@
  * @class The map controller
  * @author Richard Habeeb, Addison Shaw 
  **/
-function Map(hud) {
-	this.hud 				= hud;
-	this.size_r 			= WINDOW_HEIGHT_CELLS;
-	this.size_c 			= WINDOW_WIDTH_CELLS;
-	this.entities; 			//a 2d array of all entities
-	this.walls; 			//a 2d array of logical walls and blocks
-	this.items; 			//a 2d array of items
-	this.player;			//reference to the player
-	this.cow;				//reference to the cow
-	this.monster_count 		= 0;
-	this.background_layer 	= new Kinetic.Layer();
-	this.items_layer 		= new Kinetic.Layer();
-	this.monster_layer 		= new Kinetic.Layer();
-	this.player_layer 		= new Kinetic.Layer();
-	this.walls_layer 		= new Kinetic.Layer();
-	this.anim_layer 		= new Kinetic.Layer();
-	this.time_map_created 	= (new Date()).getTime();
-	this.item_count 		= 0;
-	this.items_count		= {};
-
-
+function Map(hud, size_r, size_c) {
+	this.hud 						= hud;
+	this.time_map_created 			= (new Date()).getTime();
+	this.size_r 					= size_r;
+	this.size_c 					= size_c;
+	this.entities; 					//a 2d array of all entities
+	this.walls; 					//a 2d array of logical walls and blocks
+	this.items; 					//a 2d array of items
+	this.player;					//reference to the player
+	this.cow;						//reference to the cow
+	this.mob_count 					= 0;
+	this.mob_cap					= 30;
+	this.largest_mob_group			= 5; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)
+	this.edge_spawn_size_cells		= 3; //the game can spawn mobs within edge_spawn_size_cells spaces of the edge
+	this.max_barriers				= 20;
+	this.min_barriers				= 3;
+	this.cowpen_min_dim				= 4;
+	this.cowpen_max_dim				= 8;
+	this.item_count 				= 0;
+	this.total_item_cap				= 10;
+	this.items_count				= {};
+	this.spawnable_items 			= ["LASER_VISION", "REPAIR_KIT", "BOMB"];
+	this.spawnable_items_probs		= {"LASER_VISION" : 0.1, "REPAIR_KIT" : 0.5, "BOMB" : 0.2 };
+	this.spawnable_items_limits		= {"LASER_VISION" : 1, "REPAIR_KIT" : 20, "BOMB" : 6 };
+	this.dropable_items				= ["REPAIR_KIT", "BOMB"];
+	this.dropable_items_probs		= {"REPAIR_KIT": 0.1, "BOMB": 0.05};
+	this.dropables_per_mob			= 3;
+	this.flood_unassigned_depth		= Number.MAX_VALUE;
+	this.background_layer 			= new Kinetic.Layer();
+	this.items_layer 				= new Kinetic.Layer();
+	this.monster_layer 				= new Kinetic.Layer();
+	this.player_layer 				= new Kinetic.Layer();
+	this.walls_layer 				= new Kinetic.Layer();
+	this.anim_layer 				= new Kinetic.Layer();
+	
+	
 	/**
 	 * Configure the map onto the KineticJS stage.
 	 * @param {Kinetic.Stage} stage
@@ -81,7 +96,7 @@ function Map(hud) {
 	 */
 	this.SetupEntities = function() {
 		this.entities = new Array();
-		this.monster_count = 0;
+		this.mob_count = 0;
 		for(var r = 0; r < this.size_r; r++) {
 			this.entities[r] = new Array();
 			for(var c = 0; c < this.size_c; c++) {
@@ -146,7 +161,7 @@ function Map(hud) {
 		
 		this.GenerateAnimalPen(this.cow.row, this.cow.col);
 		
-		var num_barriers = MAP_MIN_BARRIERS + Math.floor(Math.random()*(MAP_MAX_BARRIERS-MAP_MIN_BARRIERS));
+		var num_barriers = this.min_barriers + Math.floor(Math.random()*(this.max_barriers-this.min_barriers));
 		
 		for(var i = 0; i < num_barriers; i++) {
 			var cell = this.GetRandomOpenCell();
@@ -166,10 +181,12 @@ function Map(hud) {
 				var attacked_ent;
 				if((attacked_ent = this.entities[cells_affected[i].r][cells_affected[i].c]) != null)  {
 					if(attacked_ent.TakeDamage(cells_affected[i].damage, entity) <= 0) {
+						//entity attacked just died.
 						entity.kills++;
 						this.entities[cells_affected[i].r][cells_affected[i].c] = null;
+						this.HandleDrops(cells_affected[i].r, cells_affected[i].c, attacked_ent.HandleDrops());
 						if(attacked_ent.type == MOB) {
-							this.monster_count--;
+							this.mob_count--;
 						} else if(attacked_ent.type == PLAYER || attacked_ent.type == COW) {
 							GameOver();
 						}
@@ -210,10 +227,10 @@ function Map(hud) {
 	this.HandleMonsterSpawning = function() {
 
 		//the probability of spawning an alien horde is proportional to the # of aliens available to spawn as well as the time since the player was last damaged.
-		if(this.monster_count < TOTAL_MOB_CAP && Math.random() > (this.monster_count/TOTAL_MOB_CAP )) { 
+		if(this.mob_count < this.mob_cap && Math.random() > (this.mob_count/this.mob_cap )) { 
 			
 			//the number of mobs that are spawned is based in part on the time since the player was last damaged. (always at least one).
-			var number_of_mobs_to_spawn = Math.ceil(Math.random()*Math.min(((new Date()).getTime() - this.player.time_of_last_hit)/(15.0*1000), 1.0)*Math.min(TOTAL_MOB_CAP - this.monster_count, TOTAL_MOB_SPAWN_GROUP));
+			var number_of_mobs_to_spawn = Math.ceil(Math.random()*Math.min(((new Date()).getTime() - this.player.time_of_last_hit)/(15.0*1000), 1.0)*Math.min(this.mob_cap - this.mob_count, this.largest_mob_group));
 			
 			//search for open area near the edge. greedy style.
 			var spawn_cell = this.GreedySearchForValidSpawnCell(number_of_mobs_to_spawn);
@@ -269,23 +286,24 @@ function Map(hud) {
 	 */
 	this.HandleItemSpawning = function() {
 
-		if(this.item_count < TOTAL_ITEM_CAP && Math.random() > (this.item_count/TOTAL_ITEM_CAP )) { 
+		if(this.item_count < this.total_item_cap && Math.random() > (this.item_count/this.total_item_cap )) { 
 		
 			var spawn_cell = this.GreedySearchForValidSpawnCell(1);
 			
 			//valid space
 			if(spawn_cell != null) { 
 				//Get random item
-				var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer, this);
+				var randItem = new Item(this.spawnable_items[Math.floor(Math.random()* (this.spawnable_items.length))], this.items_layer, this.anim_layer, this);
 				
 				
 				// Get item bias probablity -- spawn item
-				if (this.items_count[randItem.key] != randItem.item_limit)
+				if (this.items_count[randItem.key] <= this.spawnable_items_limits[randItem.key])
 				{
-					if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100)) {
+					if (this.spawnable_items_probs[randItem.key] >= Math.random()) {
 						randItem.ShowImageOnMap(spawn_cell["r"], spawn_cell["c"]);
 						this.items_count[randItem.key]++;
 						this.item_count++;
+						this.items[spawn_cell["r"]][spawn_cell["r"]] = randItem;
 					}
 						
 				}
@@ -333,19 +351,27 @@ function Map(hud) {
 	 * @param {int} c
 	 */
 	this.SpawnMob = function(r, c) {
+		
 		var mob = new Entity(this.monster_layer, r, c, this.cow);
-		var item = this.ProbablyGetItem();
-		if (item != null)
-			mob.AddItem(item);
-			
-		mob.AddItem(new Item("CROWBAR", this.items_layer, this.anim_layer, this));
-		mob.move_time = 1;
 		mob.type = MOB;
 		mob.health = 50 + Math.floor(Math.random()*this.player.kills*10);
 		mob.max_health = mob.health;
+		mob.move_time = 1;
+		
+		for(var j = 0; j < this.dropables_per_mob; j++) {//iterate though the possible drops and possibly pick one. 
+			for(var i = 0; i < this.dropable_items.length; i++) {  
+				if(Math.random() < this.dropable_items_probs[this.dropable_items[i]]) {
+					mob.AddItem(new Item(this.dropable_items[i], this.items_layer, this.anim_layer, this));
+					break;
+				}
+			}
+		}
+		mob.AddItem(new Item("CROWBAR", this.items_layer, this.anim_layer, this));
+		
 		mob.imageObj.src = ALIEN_IMAGES[Math.floor(Math.random()*ALIEN_IMAGES.length)];
+		
 		this.entities[mob.row][mob.col] = mob;
-		this.monster_count++;
+		this.mob_count++;
 	};
 	
 	
@@ -511,7 +537,7 @@ function Map(hud) {
 					!this.walls[row_start][col_start][headings[i]] && 
 					!this.walls[cell["r"]][cell["c"]][BLOCKED] && 
 					(this.entities[cell["r"]][cell["c"]] == null || ignore_entities || (cell["r"] == row_end && cell["c"] == col_end)) &&
-					flooded_map[next_best_cell["r"]][next_best_cell["c"]] != UNASSIGNED_FLOOD_DEPTH &&
+					flooded_map[next_best_cell["r"]][next_best_cell["c"]] != this.flood_unassigned_depth &&
 					flooded_map[next_best_cell["r"]][next_best_cell["c"]] > flooded_map[cell["r"]][cell["c"]]
 				  ) 
 				{
@@ -548,11 +574,13 @@ function Map(hud) {
 	 * @return {int, int} flooded_map each element in this array will contain the "depth" or the number of steps to get to the middle.
 	 */
 	this.FloodMap = function(row_end, col_end, row_start, col_start, ignore_entities) {
+		var flood_max_depth = this.size_r*this.size_c;	
+		
 		var flooded_map = new Array();
 		for(var r = 0; r < this.size_r; r++) {
 			flooded_map[r] = new Array();
 			for(var c = 0; c < this.size_c; c++) {
-				flooded_map[r][c] = UNASSIGNED_FLOOD_DEPTH;
+				flooded_map[r][c] = this.flood_unassigned_depth;
 			}
 		}
 
@@ -560,7 +588,7 @@ function Map(hud) {
 		var flood_change = true;
 		
 		// Flood from the goal of the maze towards the current position
-		for(var frontier_depth = 1; frontier_depth < MAX_FRONTIER_DEPTH; frontier_depth++) 
+		for(var frontier_depth = 1; frontier_depth < flood_max_depth; frontier_depth++) 
 		{
 			if(!flood_change) return; //dead end check
 			else flood_change = false;
@@ -569,7 +597,7 @@ function Map(hud) {
 			{
 				for(var c = 0; c < this.size_c; c++)
 				{ 
-					if	(	flooded_map[r][c] == UNASSIGNED_FLOOD_DEPTH && 
+					if	(	flooded_map[r][c] == this.flood_unassigned_depth && 
 							!this.walls[r][c][BLOCKED] && 
 							(
 								this.entities[r][c] == null || 
@@ -604,8 +632,8 @@ function Map(hud) {
 		var headings = [NORTH,EAST,SOUTH,WEST];
 		
 		//setup cow pen
-		var fence_size_c = MAP_COWPEN_MIN_DIM + Math.floor(Math.random() * (MAP_COWPEN_MAX_DIM - MAP_COWPEN_MIN_DIM));
-		var fence_size_r = MAP_COWPEN_MIN_DIM + Math.floor(Math.random() * (MAP_COWPEN_MAX_DIM - MAP_COWPEN_MIN_DIM));
+		var fence_size_c = this.cowpen_min_dim + Math.floor(Math.random() * (this.cowpen_max_dim - this.cowpen_min_dim));
+		var fence_size_r = this.cowpen_min_dim + Math.floor(Math.random() * (this.cowpen_max_dim - this.cowpen_min_dim));
 		
 		var fence_opening_side = headings[Math.floor(Math.random() * headings.length)];
 		var fence_opening_size = 1;
@@ -663,10 +691,10 @@ function Map(hud) {
 					cell_c >= 0 &&
 					cell_c < this.size_c &&
 					(	
-						cell_r < MAP_EDGE_SPAWN_ZONE || 
-						cell_r >= this.size_r-MAP_EDGE_SPAWN_ZONE ||
-						cell_c < MAP_EDGE_SPAWN_ZONE ||
-						cell_c >= this.size_c-MAP_EDGE_SPAWN_ZONE
+						cell_r < this.edge_spawn_size_cells || 
+						cell_r >= this.size_r-this.edge_spawn_size_cells ||
+						cell_c < this.edge_spawn_size_cells ||
+						cell_c >= this.size_c-this.edge_spawn_size_cells
 					) &&
 					!(
 						this.walls[cell_r][cell_c][NORTH] && 
@@ -756,22 +784,6 @@ function Map(hud) {
 	
 	
 	/**
-	 * This method may return an item, but maybe it wont.
-	 * @return {Item}
-	 */
-	this.ProbablyGetItem = function() {
-		var randItem = new Item(ITEM_ARRAY[Math.floor(Math.random()* (ITEM_ARRAY.length))], this.items_layer, this.anim_layer, this);
-		switch(randItem.key)
-		{
-			case "REPAIR_KIT":
-				if (ITEM_PROBS[randItem.key] <= Math.floor(Math.random() * 100))
-					return randItem;
-		}
-		return null;
-	};
-	
-	
-	/**
 	 * This method will add a fence onto the map.
 	 * @param {int} row
 	 * @param {int} col
@@ -835,4 +847,55 @@ function Map(hud) {
 			}
 		}
 	};
+	
+	
+	/**
+	 * This method uses a flood fill to drop all the items in an array on the nearby ground
+	 * @param {int} row
+	 * @param {int} col
+	 * @param {Array} drops
+	 */
+	this.HandleDrops = function(row, col, drops) {
+		if(drops != null && drops.length >= 0) {
+			var headings = new Array(NORTH,EAST,SOUTH,WEST);
+			var index = 0;
+			var queue = [{"r": row, "c":col }];
+			
+			while(index < drops.length && queue.length > 0) {
+				var frontier_cell = queue[0];
+				queue.splice(0,1);
+				
+				if(	
+					!this.walls[frontier_cell["r"]][frontier_cell["c"]][BLOCKED] && 
+					this.entities[frontier_cell["r"]][frontier_cell["c"]] == null &&
+					this.items[frontier_cell["r"]][frontier_cell["c"]] == null) 
+				{
+					if(this.items_count[drops[index].key] <= this.spawnable_items_limits[drops[index].key]) 
+					{
+						drops[index].ShowImageOnMap(frontier_cell.r, frontier_cell["c"]);
+						this.items[frontier_cell["r"]][frontier_cell["c"]] = drops[index];
+						this.items_count[drops[index].key]++;
+						this.item_count++;
+					}
+					index++;
+				}
+				
+				for(var i = 0; i < headings.length; i++) {
+					var cell = this.GetCellInHeading(frontier_cell["r"], frontier_cell["c"], headings[i]);
+					
+					
+					if(	
+						!this.walls[frontier_cell["r"]][frontier_cell["c"]][headings[i]] && 
+						!this.walls[cell["r"]][cell["c"]][BLOCKED] && 
+						this.entities[cell["r"]][cell["c"]] == null &&
+						this.items[cell["r"]][cell["c"]] == null) 
+					{	
+						queue.push(cell);
+					}		
+				}
+			} //end while
+		}
+	}; //END HandleDrops
+	
+	
 }

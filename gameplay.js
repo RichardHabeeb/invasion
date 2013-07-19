@@ -29,7 +29,7 @@ function GameOver() {
 var hud_stage = new Kinetic.Stage({
 	container: 'GameHud',
 	width: WINDOW_WIDTH_CELLS*PX_PER_CELL,
-	height: HUD_HEIGHT
+	height: parseInt(window.getComputedStyle(document.getElementById("GameHud")).getPropertyValue("height"))
 });
 var hud_top = new Hud(hud_stage);
 
@@ -42,7 +42,7 @@ var window_stage = new Kinetic.Stage({
 	height: WINDOW_HEIGHT_CELLS*PX_PER_CELL
 });
 
-var current_map = new Map(hud_top);
+var current_map = new Map(hud_top, WINDOW_HEIGHT_CELLS, WINDOW_WIDTH_CELLS);
 current_map.SetupMapOnStage(window_stage);
 current_map.SetupWalls();
 current_map.SetupEntities();

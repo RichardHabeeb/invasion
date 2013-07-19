@@ -5,7 +5,6 @@
  * TODO:
  *  -all the things.
  **/
-
 function Item(key, map_layer, animation_layer, parent)
 {
 	var self 					= this;
@@ -13,7 +12,6 @@ function Item(key, map_layer, animation_layer, parent)
 	this.key 					= key;
 	this.name 					= ITEM_DICT[key].name;
 	this.type 					= ITEM_DICT[key].type;
-	this.item_limit				= ITEM_SPAWN_LIMITS[key];
 	this.icon_image				= new Image();
 	this.map_image 				= new Image();
 	this.animation_image		= new Image();
@@ -38,7 +36,7 @@ function Item(key, map_layer, animation_layer, parent)
 	this.heading				= NORTH;
 	
 	//EQUIP PROPERTIES
-	if(this.type == EQUIP) {
+	if(this.type == ITEM_TYPES.EQUIP) {
 		this.single_direction = ITEM_DICT[key].single_direction;
 		this.melee = ITEM_DICT[key].melee;
 		this.range = ITEM_DICT[key].range;

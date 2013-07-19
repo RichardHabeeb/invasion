@@ -8,6 +8,12 @@
  * @class An entity structure. This can be a Mob, the Player, or Cow.
  * @author Richard Habeeb, Addison Shaw 
  **/
+
+ const PLAYER = "PLAYER";
+ const MOB = "MOB";
+ const COW = "COW";
+
+
 function Entity(layer, r, c, target) {
 	var self 					= this;
 	this.health 				= 100;
@@ -108,9 +114,9 @@ function Entity(layer, r, c, target) {
 	}
 	
 	this.Attack = function() {
-		if(this.loaded && typeof this.current_equip != "undefined" && !this.current_equip.is_animating && (this.current_equip.type == EQUIP || this.current_equip.type == SINGLE_USE_WEAPON)) {
+		if(this.loaded && typeof this.current_equip != "undefined" && !this.current_equip.is_animating && (this.current_equip.type == ITEM_TYPES.EQUIP || this.current_equip.type == ITEM_TYPES.SINGLE_USE_WEAPON)) {
 			var cells_affected = new Array();
-			if(this.current_equip.type == EQUIP) {
+			if(this.current_equip.type == ITEM_TYPES.EQUIP) {
 				if(this.current_equip.melee) {
 					if(this.current_equip.single_direction) {
 						var pos = {x:this.x, y:this.y};
@@ -178,7 +184,7 @@ function Entity(layer, r, c, target) {
 					});
 					self.anim.play();
 					
-					if(self.health <= 0) self.OnDeath();
+					if(self.health <= 0) self.sprite.destroy();
 				}
 			});
 			this.anim.play();
@@ -204,10 +210,6 @@ function Entity(layer, r, c, target) {
 	}
 
 	
-	this.OnDeath = function() {
-		this.sprite.destroy();
-		return this.HandleDrops();
-	}
 	
 	this.EquipItem = function(item)
 	{
@@ -217,7 +219,7 @@ function Entity(layer, r, c, target) {
 	//Adds the given item to 'inventoy'
 	this.AddItem = function(item) 
 	{
-		if (item.type == EQUIP) {
+		if (item.type == ITEM_TYPES.EQUIP) {
 			this.items.push(item);
 			this.EquipItem(item);
 		} else {
@@ -242,18 +244,7 @@ function Entity(layer, r, c, target) {
 
 	this.HandleDrops = function()
 	{
-		for (var i = 0; i < this.single_use_repairs.length; i++)
-		{
-			var currItem = this.single_use_repairs[i];
-			
-			if (ITEM_PROBS[currItem.key] <= Math.floor(Math.random() * 100) 
-			&& currItem.parent.items_count[currItem.key] != ITEM_SPAWN_LIMITS[currItem.key] 
-			&& currItem.parent.IsValidOpenCell(this.row, this.col)) {
-				currItem.parent.items_count[currItem.key]++;
-				return currItem.ShowImageOnMap(this.row, this.col);
-			}
-		
-		}
+		return this.single_use_repairs;
 	}
 	
 	
