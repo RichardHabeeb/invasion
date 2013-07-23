@@ -23,11 +23,11 @@ function Map(hud, size_r, size_c) {
 	this.cow;						//reference to the cow
 	this.mob_count 					= 0;
 	this.mob_cap					= 40;
-	this.largest_mob_group			= 10; //# of aliens that can spawn at once in a group (DONT DO MORE THAN 5!!!)
+	this.largest_mob_group			= 10; //# of aliens that can spawn at once in a group.
 	this.horde_states				= ["BUILD", "PEAK", "RESTORE"];
 	this.horde_state				= 0; //BUILD
 	this.horde_state_time			= (new Date()).getTime();
-	this.horde_state_max_time		= 2*60*1000; //ms
+	this.horde_state_max_time		= 1*60*1000; //ms
 	this.edge_spawn_size_cells		= 3; //the game can spawn mobs within edge_spawn_size_cells spaces of the edge
 	this.max_barriers				= 20;
 	this.min_barriers				= 3;
@@ -239,47 +239,45 @@ function Map(hud, size_r, size_c) {
 	 *  distance of player from the cow
 	 */
 	this.HandleMonsterSpawning = function() {
-		var headings = new Array(NORTH,EAST,SOUTH,WEST);
 		var current_time = (new Date()).getTime();
+		var max_mobs = this.mob_cap;
+		var number_of_mobs_to_spawn = 0;
 		
 		if(current_time - this.horde_state_time > this.horde_state_max_time) {
 			this.horde_state = (this.horde_state+1) % this.horde_states.length;
 			this.horde_state_time = current_time;
+			console.log("AI State:" + this.horde_states[this.horde_state]);
+		}
+		
+		if(this.horde_states[this.horde_state] == "BUILD") {
+			max_mobs = Math.floor(this.mob_cap / 2);
+			//the number of mobs that are spawned is based in part on the time since the player was last damaged. (always at least one).
+			number_of_mobs_to_spawn = Math.ceil(Math.random()*Math.min(((new Date()).getTime() - this.player.time_of_last_hit)/(15.0*1000), 1.0)*Math.min(max_mobs - this.mob_count, this.largest_mob_group));
+		}
+			
+		if(this.horde_states[this.horde_state] == "PEAK") {
+			max_mobs = this.mob_cap;
+			number_of_mobs_to_spawn = Math.min(max_mobs-this.mob_count, this.largest_mob_group);
+			
+			if(number_of_mobs_to_spawn == 0) this.horde_state = (this.horde_state+1) % this.horde_states.length;
+		}
+		
+		if(this.horde_states[this.horde_state] == "RESTORE") {
+			max_mobs = Math.floor(this.mob_cap / 4);
+			number_of_mobs_to_spawn = 1;
 		}
 		
 		
-		if(this.horde_states[this.horde_state] == "BUILD") {
-			var max_mobs = Math.floor(this.mob_cap / 2);
-	
-			//the probability of spawning an alien horde is proportional to the # of aliens available to spawn as well as the time since the player was last damaged.
-			if(this.mob_count < this.mob_cap && Math.random() > (this.mob_count/this.mob_cap )) { 
-				
-				//the number of mobs that are spawned is based in part on the time since the player was last damaged. (always at least one).
-				var number_of_mobs_to_spawn = Math.ceil(Math.random()*Math.min(((new Date()).getTime() - this.player.time_of_last_hit)/(15.0*1000), 1.0)*Math.min(this.mob_cap - this.mob_count, this.largest_mob_group));
-							
-				var number_spawned_already = 0;
-				var queue = [this.GetRandomSpawnCell()];
-				
-				while(number_spawned_already < number_of_mobs_to_spawn && queue.length > 0 && queue[0] != null) {
-					var frontier_cell = queue[0];
-					queue.splice(0,1);
-					
-					if(this.IsValidSpawnCell(frontier_cell["r"], frontier_cell["c"]))
-					{
-						this.SpawnMob(frontier_cell["r"], frontier_cell["c"]);
-						number_spawned_already++;
-					}
-					
-					for(var i = 0; i < headings.length; i++) {
-						var cell = this.GetCellInHeading(frontier_cell["r"], frontier_cell["c"], headings[i]);
+		
+		
+		
+		
+		//the probability of spawning an alien horde is proportional to the # of aliens available to spawn as well as the time since the player was last damaged.
+		if(this.mob_count < max_mobs && Math.random() > (this.mob_count/max_mobs )) { 
+			
+			this.SpawnMobGroup(number_of_mobs_to_spawn, this.GetRandomSpawnCell());
+			
 
-						if(!this.walls[frontier_cell["r"]][frontier_cell["c"]][headings[i]] && this.IsValidSpawnCell(cell["r"], cell["c"]))
-						{	
-							queue.push(cell);
-						}		
-					}
-				} //end while
-			}
 		}
 		
 		
@@ -364,6 +362,38 @@ function Map(hud, size_r, size_c) {
 			this.MoveEntity(this.cow, headings[Math.floor(Math.random()*headings.length)]);
 		}
 	};
+	
+	
+	/**
+	 * Spawn a mob group on the map at a cell.
+	 * @param {int} r
+	 * @param {int} c
+	 */
+	this.SpawnMobGroup = function(number_to_spawn, cell) {
+		var headings = new Array(NORTH,EAST,SOUTH,WEST);
+		var number_spawned_already = 0;
+		var queue = [cell];
+		
+		while(number_spawned_already < number_to_spawn && queue.length > 0 && queue[0] != null) {
+			var frontier_cell = queue[0];
+			queue.splice(0,1);
+			
+			if(this.IsValidSpawnCell(frontier_cell["r"], frontier_cell["c"]))
+			{
+				this.SpawnMob(frontier_cell["r"], frontier_cell["c"]);
+				number_spawned_already++;
+			}
+			
+			for(var i = 0; i < headings.length; i++) {
+				var cell = this.GetCellInHeading(frontier_cell["r"], frontier_cell["c"], headings[i]);
+	
+				if(!this.walls[frontier_cell["r"]][frontier_cell["c"]][headings[i]] && this.IsValidSpawnCell(cell["r"], cell["c"]))
+				{	
+					queue.push(cell);
+				}		
+			}
+		} //end while
+	}
 	
 	
 	/**
