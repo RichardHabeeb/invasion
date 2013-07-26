@@ -25,6 +25,15 @@ function Hud(stage) {
 		fillLinearGradientColorStops: [0, "#303030", 1, "#1E1E1E"]
 	});
 	
+	this.player_exp_bar = new Kinetic.Rect({
+		x: 20,
+		y: 10,
+		width: 10,
+		height: 5,
+		fill: 'white'
+	});
+	
+
 	this.player_text = new Kinetic.Text({
 		x: 15,
 		y: 6,
@@ -74,7 +83,7 @@ function Hud(stage) {
 		text: 'KILLS',
 		fontSize: 12,
 		fontFamily: 'Square',
-		fill: '#A030BF'
+		fill: '#cc3333'
 	});
 	
 	this.kills_text = new Kinetic.Text({
@@ -84,19 +93,109 @@ function Hud(stage) {
 		text: '0',
 		fontSize: 25,
 		fontFamily: 'Square',
+		fill: '#cc6666'
+	});
+	
+	this.levels_text_title = new Kinetic.Text({
+		x: 380,
+		y: 8,
+		text: 'LEVEL',
+		fontSize: 12,
+		fontFamily: 'Square',
+		fill: '#A030BF'
+	});
+	
+	this.levels_text = new Kinetic.Text({
+		x: 380,
+		y: 18,
+		y: 18,
+		text: '1',
+		fontSize: 25,
+		fontFamily: 'Square',
 		fill: '#E073FF'
 	});
 	
 	
+	this.equip_text_title = new Kinetic.Text({
+		x: 442,
+		y: 8,
+		text: 'EQUIP',
+		fontSize: 12,
+		fontFamily: 'Square',
+		rotationDeg: 90,
+		fill: '#669900'
+	});
+	this.equipImg = new Image();
+	this.equipImg.src = 'images/tazer.png';
+	this.equipImg.style.border ='2px solid #F00';
+	this.equip = new Kinetic.Image({
+			x: 442,
+			y: 8,
+			width: PX_PER_CELL,
+			height: PX_PER_CELL,
+			image: this.equipImg
+	});
+	this.equipImg.onload = function() {
+		self.layer.add(self.equip);
+	}
+	this.equip_bg = new Kinetic.Rect({
+		x: 442,
+		y: 8,
+		width: PX_PER_CELL,
+		height: PX_PER_CELL,
+		fillLinearGradientStartPoint: 	{x: 0, y:0 },
+		fillLinearGradientEndPoint: 	{x: 0, y:30 },
+		fillLinearGradientColorStops: [0, "#303030", 1, "#1E1E1E"]
+	});
+	
+	
+	this.single_text_title = new Kinetic.Text({
+		x: 492,
+		y: 8,
+		text: 'ITEM',
+		fontSize: 12,
+		rotationDeg: 90,
+		fontFamily: 'Square',
+		fill: '#94B84D'
+	});
+	
+	this.singleImg = new Image();
+	this.singleImg.src = 'images/repair-kit.png';
+	this.single = new Kinetic.Image({
+			x: 492,
+			y: 8,
+			width: PX_PER_CELL,
+			height: PX_PER_CELL,
+			image: this.singleImg
+	});
+	this.singleImg.onload = function() {
+		self.layer.add(self.single);
+	}
+	this.single_bg = new Kinetic.Rect({
+		x: 492,
+		y: 8,
+		width: PX_PER_CELL,
+		height: PX_PER_CELL,
+		fillLinearGradientStartPoint: 	{x: 0, y:0 },
+		fillLinearGradientEndPoint: 	{x: 0, y:30 },
+		fillLinearGradientColorStops: [0, "#303030", 1, "#1E1E1E"]
+	});
+	
 	this.layer.add(this.player_health_bar_bg);
 	this.layer.add(this.player_health_bar);
+	this.layer.add(this.player_exp_bar);
 	this.layer.add(this.cow_health_bar_bg);
 	this.layer.add(this.cow_health_bar);
 	this.layer.add(this.player_text);
 	this.layer.add(this.cow_text);
 	this.layer.add(this.kills_text);
 	this.layer.add(this.kills_text_title);
-	
+	this.layer.add(this.levels_text);
+	this.layer.add(this.levels_text_title);
+	this.layer.add(this.equip_bg);
+	this.layer.add(this.equip_text_title);
+	this.layer.add(this.single_bg);
+	this.layer.add(this.single_text_title);
 	
 	//This should queue up animations if it is already animating.
 	this.UpdateStats = function(entity) {
